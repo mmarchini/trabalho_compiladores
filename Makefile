@@ -1,6 +1,6 @@
 all: lex.yy.o analisador.o
 	@echo "Montando o analisador"
-	@gcc main.o lex.yy.o -o analisador
+	@gcc main.o lex.yy.o -o etapa1 
 
 analisador.o: main.c
 	@echo "Compilar o main.c"
