@@ -6,7 +6,9 @@ void initMe(){
 }
 
 int main(){
-    yylex();
+    while(1){
+        printf("%d\n", yylex());
+    }
     return 0;
 }
 

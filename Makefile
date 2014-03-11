@@ -1,15 +1,19 @@
-all: lex.yy.o analisador.o
+all: lex.yy.o analisador.o hash.o
 	@echo "Montando o analisador"
-	@gcc main.o lex.yy.o -o etapa1 
+	@gcc main.o lex.yy.o hash.o -L . -o etapa1 
 
 analisador.o: main.c
 	@echo "Compilar o main.c"
-	@gcc -c main.c -o main.o
+	@gcc -std=c99 -c main.c -o main.o
 
 lex.yy.o: analisador.l
 	@echo "Compilar o analisador.l"
 	@lex analisador.l
-	@gcc -c lex.yy.c -o lex.yy.o
+	@gcc -std=c99 -c lex.yy.c -o lex.yy.o
+
+hash.o: hash.c hash.h
+	@echo "Compilando a tabela Hash"
+	@gcc -std=c99 -c hash.c -o hash.o
 
 clean:
-	@rm -f lex.yy.* *.o analisador
+	@rm -f lex.yy.* *.o etapa1 
