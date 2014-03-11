@@ -4,53 +4,60 @@
 
     extern int running;
     extern int nline;
+    extern HashTable *hashTable;
+
+    extern int commentControl;
 %}
 %%
 
 [,;:()-/<>=!&\{\}\[\]\+\*\$]      return yytext[0];
 
-\<=      return OPERATOR_LE;
->=      return OPERATOR_GE;
-==      return OPERATOR_EQ;
-!=      return OPERATOR_NE;
-&&      return OPERATOR_AND;
-\|\|      return OPERATOR_OR;
+\<=      if(!commentControl) return OPERATOR_LE;
+>=       if(!commentControl) return OPERATOR_GE;
+==       if(!commentControl) return OPERATOR_EQ;
+!=       if(!commentControl) return OPERATOR_NE;
+&&       if(!commentControl) return OPERATOR_AND;
+\|\|     if(!commentControl) return OPERATOR_OR;
 
 
-word   return KW_WORD; 
-bool   return KW_BOOL; 
-byte   return KW_BYTE; 
-if     return KW_IF; 
-then   return KW_THEN; 
-else   return KW_ELSE; 
-loop   return KW_LOOP; 
-input  return KW_INPUT; 
-output return KW_OUTPUT; 
-return return KW_RETURN; 
+word     if(!commentControl) return KW_WORD; 
+bool     if(!commentControl) return KW_BOOL; 
+byte     if(!commentControl) return KW_BYTE; 
+if       if(!commentControl) return KW_IF; 
+then     if(!commentControl) return KW_THEN; 
+else     if(!commentControl) return KW_ELSE; 
+loop     if(!commentControl) return KW_LOOP; 
+input    if(!commentControl) return KW_INPUT; 
+output   if(!commentControl) return KW_OUTPUT; 
+return   if(!commentControl) return KW_RETURN; 
 
 
-False                  return LIT_FALSE; 
-false                  return LIT_FALSE; 
-FALSE                  return LIT_FALSE; 
+False                  if(!commentControl) return LIT_FALSE; 
+false                  if(!commentControl) return LIT_FALSE; 
+FALSE                  if(!commentControl) return LIT_FALSE; 
 
-True                   return LIT_TRUE; 
-true                   return LIT_TRUE; 
-TRUE                   return LIT_TRUE; 
+True                   if(!commentControl) return LIT_TRUE; 
+true                   if(!commentControl) return LIT_TRUE; 
+TRUE                   if(!commentControl) return LIT_TRUE; 
 
-[a-zA-Z][a-zA-Z0-9_]*  return TK_IDENTIFIER;
-[0-9][0-9a-fA-F]*      return LIT_INTEGER;
-'.'                    return LIT_CHAR;
+[a-zA-Z][a-zA-Z0-9_]*  if(!commentControl) {hashInsert(hashTable, yytext, TK_IDENTIFIER); return TK_IDENTIFIER;}
+[0-9][0-9a-fA-F]*      if(!commentControl) return LIT_INTEGER;
+'.'                    if(!commentControl) return LIT_CHAR;
 
-\".*\"                   return LIT_STRING; 
+\".*\"                 if(!commentControl) return LIT_STRING; 
 
 " "*     {}
 \t*    {}
 
-.*      return TOKEN_ERROR;
-
 \n      nline++;
 
 <<EOF>>      {running=0; return;}
+
+\/\/.*    {}
+\/\*      {commentControl = 1;}
+\*\/      {commentControl = 1;}
+
+.*      if(!commentControl) return TOKEN_ERROR;
 
 %%
 
