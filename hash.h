@@ -1,4 +1,5 @@
-
+#ifndef _HASH
+#define _HASH
 
 typedef struct _HashTable{
     char *value;
@@ -16,3 +17,4 @@ int hashCalculate(char *value);
 
 void hashPrint(HashTable *hash);
 
+#endif

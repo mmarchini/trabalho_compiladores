@@ -1,12 +1,14 @@
 %{
     #include "hash.h"
     #include "tokens.h"
+    #include "util.h"
 
-    extern int running;
-    extern int nline;
-    extern HashTable *hashTable;
+    int running;
+    int nline;
+    HashTable *hashTable;
 
-    extern int commentControl;
+    int commentControl;
+
 %}
 %%
 
@@ -54,8 +56,8 @@ TRUE                   if(!commentControl) return LIT_TRUE;
 <<EOF>>      {running=0; return;}
 
 \/\/.*    {}
-\/\*      {commentControl = 1;}
-\*\/      {commentControl = 1;}
+\/\*      {printf("COMENTARIO START! '%s'\n", yytext);}
+\*\/      {printf("COMENTARIO END!"); commentControl = 0;}
 
 .*      if(!commentControl) return TOKEN_ERROR;
 

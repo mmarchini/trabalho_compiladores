@@ -1,28 +1,14 @@
 #include <stdio.h>
 #include "hash.h"
+#include "util.h"
 
 HashTable *hashTable;
-int running;
-int nline;
-int commentControl;
-
-int yywrap(){
-    return 1;
-}
-
-void initMe(){
-    running = 1;
-    nline=0;
-    commentControl=0;
-    hashTable = hashInit();
-}
-
-int getLineNumber(){ return nline; }
-
+int running; //TODO Perguntar para o professor
 
 int main(){
     int lexReturn;
     initMe();
+
     while(running){
         lexReturn=yylex();
         if(running)
