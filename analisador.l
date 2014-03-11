@@ -2,9 +2,11 @@
     #include "hash.h"
     #include "tokens.h"
 
-    HashTable *hashTable;
+    extern int running;
+    extern int nline;
 %}
 %%
+
 [,;:()-/<>=!&\{\}\[\]\+\*\$]      return yytext[0];
 
 \<=      return OPERATOR_LE;
@@ -45,6 +47,11 @@ TRUE                   return LIT_TRUE;
 \t*    {}
 
 .*      return TOKEN_ERROR;
+
+\n      nline++;
+
+<<EOF>>      {running=0; return;}
+
 %%
 
 
