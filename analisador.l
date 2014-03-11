@@ -56,10 +56,9 @@ TRUE                   if(!commentControl) return LIT_TRUE;
 <<EOF>>      {running=0; return;}
 
 \/\/.*    {}
-\/\*      {printf("COMENTARIO START! '%s'\n", yytext);}
-\*\/      {printf("COMENTARIO END!"); commentControl = 0;}
+"/*"      { commentControl = 1;}
+\*\/      { commentControl = 0;}
 
-.*      if(!commentControl) return TOKEN_ERROR;
 
 %%
 
