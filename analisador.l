@@ -19,7 +19,7 @@
 [ \t]   ;
 \n      nline++;
 
-
+    /* Operators */
 [,;:()-/<>=!&\{\}\[\]\+\*\$]      return yytext[0];
 
 \<=      return OPERATOR_LE;
@@ -29,7 +29,7 @@
 &&       return OPERATOR_AND;
 \|\|     return OPERATOR_OR;
 
-
+    /* Keywords */
 word     return KW_WORD; 
 bool     return KW_BOOL; 
 byte     return KW_BYTE; 
@@ -41,17 +41,22 @@ input    return KW_INPUT;
 output   return KW_OUTPUT; 
 return   return KW_RETURN; 
 
+    /* Identifiers */
+[0-9]*[a-zA-Z]+[a-zA-Z0-9_]*  {hashInsert(hashTable, yytext, TK_IDENTIFIER); return TK_IDENTIFIER;}
 
-false                  return LIT_FALSE; 
+    /* Literals */
 
-true                   return LIT_TRUE; 
+    /* Booleans */
+false                  {hashInsert(hashTable, yytext, LIT_FALSE); return LIT_FALSE;}
+true                   {hashInsert(hashTable, yytext, LIT_TRUE); return LIT_TRUE;} 
 
-[a-zA-Z][a-zA-Z0-9_]*  {hashInsert(hashTable, yytext, TK_IDENTIFIER); return TK_IDENTIFIER;}
-[0-9][0-9a-fA-F]*      return LIT_INTEGER;
+    /* Integers */
+[0-9]*                 {hashInsert(hashTable, yytext, LIT_INTEGER); return LIT_INTEGER;} 
 
+    /* Characters */
+'.'                    {char auxChar[2]; auxChar[0]=yytext[1]; auxChar[1]='\0'; hashInsert(hashTable, auxChar, LIT_INTEGER); return LIT_CHAR;}
 
-'.'                    return LIT_CHAR;
-
+    /* Begin String Rule */
 \" { BEGIN STRING; s = buf; } 
 <STRING>\\n { *s++ = '\n'; } 
 <STRING>\\t { *s++ = '\t'; } 
@@ -69,15 +74,18 @@ true                   return LIT_TRUE;
 } 
 <STRING>\n { nline++; *s++ = '\n';} 
 <STRING>. { *s++ = yytext[0]; }
+    /* End String Rule */
 
-<<EOF>>      {running=0; return;}
-
-\/\/.*    {}
-"/**/"                    { }
-"/*"[^ \t\n"*/"]*                    { BEGIN COMMENT_BLOCK; }
+    /* Begin Comments */
+\/\/.*                  {}
+"/**/"                  { }
+"/*"[^ \t\n"*/"]*       { BEGIN COMMENT_BLOCK; }
 <COMMENT_BLOCK>"*/"     { BEGIN 0;}
 <COMMENT_BLOCK>\n       {nline++;}
-<COMMENT_BLOCK>.       {}
+<COMMENT_BLOCK>.        {}
+    /* End Comments */
+
+<<EOF>>      {running=0; return;}
 
     /*[^ \t\n]+      { return TOKEN_ERROR; } */
 

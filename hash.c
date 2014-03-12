@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define HASH_SIZE 11
+#define HASH_SIZE 993 
 
 void hashPrint(HashTable *hash){
     int i;
@@ -10,18 +10,17 @@ void hashPrint(HashTable *hash){
     for(i=0;i<HASH_SIZE;i++){
         HashTable *curHash=&hash[i];
         if(curHash->value){
-            printf("New Hash Index:\n");
             for(;curHash->next;curHash=curHash->next){
-                    printf("%s\n", curHash->value);
+                    printf("HASH[%i]: %s\n", i, curHash->value);
             }
             if(curHash->value)
-                printf("%s\n", curHash->value);
+                printf("HASH[%i]: %s\n", i, curHash->value);
         }
     }
 }
 
 HashTable *hashInit(){
-    HashTable *hash = calloc(11, sizeof(HashTable));
+    HashTable *hash = calloc(HASH_SIZE, sizeof(HashTable));
     if(!hash){
         exit(1);
     }
@@ -31,11 +30,13 @@ HashTable *hashInit(){
 int hashCalculate(char *value){
     int i;
     int hashIndex = 1;
-    for(i=0; i<strlen(value)-1; i++) hashIndex*=value[i];
-    return hashIndex % HASH_SIZE;
+    for(i=0; i<strlen(value)-1; i++) hashIndex = (hashIndex*value[i])%HASH_SIZE + 1;
+    return hashIndex - 1;
 }
 
 void hashInsert(HashTable *hash, char *value, int code){
+    if(hashSearch(hash, value))
+        return;
     int hashIndex = hashCalculate(value); 
     HashTable *curHash = &hash[hashIndex];
 
@@ -59,9 +60,11 @@ void hashInsert(HashTable *hash, char *value, int code){
 
 HashTable *hashSearch(HashTable *hash, char *value){
     HashTable *curHash=&hash[hashCalculate(value)];
+    if(!curHash->value)
+        return 0;
     for(
         ;
-        curHash->next && !strcmp(value, curHash->value);
+        curHash->next && strcmp(value, curHash->value);
         curHash=curHash->next
     ); 
     if(strcmp(curHash->value, value))
