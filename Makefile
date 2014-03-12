@@ -1,14 +1,14 @@
-all: lex.yy.o analisador.o hash.o util.o
-	@echo "Montando o analisador"
+all: lex.yy.o scanner.o hash.o util.o
+	@echo "Montando o scanner"
 	@gcc util.o main.o lex.yy.o hash.o -L . -o etapa1 
 
-analisador.o: main.c
+scanner.o: main.c
 	@echo "Compilar o main.c"
 	@gcc -c main.c -o main.o
 
-lex.yy.o: analisador.l
-	@echo "Compilar o analisador.l"
-	@lex analisador.l
+lex.yy.o: scanner.l
+	@echo "Compilar o scanner.l"
+	@lex scanner.l
 	@gcc -c lex.yy.c -o lex.yy.o
 
 hash.o: hash.c hash.h
