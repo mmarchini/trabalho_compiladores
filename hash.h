@@ -11,7 +11,7 @@ HashTable *hashInit();
 
 void hashInsert(HashTable *hash, char *value, int code);
 
-HashTable *hashSearch(HashTable *hash, char *value);
+HashTable *hashSearch(HashTable *hash, char *value, int code);
 
 int hashCalculate(char *value);
 

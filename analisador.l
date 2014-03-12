@@ -55,7 +55,7 @@ true                   {hashInsert(hashTable, yytext, LIT_TRUE); return LIT_TRUE
 '.'                    {char auxChar[2]; auxChar[0]=yytext[1]; auxChar[1]='\0'; hashInsert(hashTable, auxChar, LIT_INTEGER); return LIT_CHAR;}
 
     /* Identifiers */
-[0-9]*[a-zA-Z]+[a-zA-Z0-9_]*  {hashInsert(hashTable, yytext, TK_IDENTIFIER); return TK_IDENTIFIER;}
+[0-9]*[_a-zA-Z]+[_a-zA-Z0-9_]*  {hashInsert(hashTable, yytext, TK_IDENTIFIER); return TK_IDENTIFIER;}
 
     /* Begin String Rule */
 \" { BEGIN STRING; s = buf; } 

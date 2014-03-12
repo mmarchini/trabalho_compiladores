@@ -35,7 +35,7 @@ int hashCalculate(char *value){
 }
 
 void hashInsert(HashTable *hash, char *value, int code){
-    if(hashSearch(hash, value))
+    if(hashSearch(hash, value, code))
         return;
     int hashIndex = hashCalculate(value); 
     HashTable *curHash = &hash[hashIndex];
@@ -58,16 +58,16 @@ void hashInsert(HashTable *hash, char *value, int code){
     curHash->code  = code;
 }
 
-HashTable *hashSearch(HashTable *hash, char *value){
+HashTable *hashSearch(HashTable *hash, char *value, int code){
     HashTable *curHash=&hash[hashCalculate(value)];
     if(!curHash->value)
         return 0;
     for(
         ;
-        curHash->next && strcmp(value, curHash->value);
+        curHash->next && (strcmp(value, curHash->value) || code != curHash->code);
         curHash=curHash->next
     ); 
-    if(strcmp(curHash->value, value))
+    if(strcmp(curHash->value, value) || code != curHash->code)
         return 0;
     return curHash;
 }
