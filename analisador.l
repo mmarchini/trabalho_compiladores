@@ -79,8 +79,7 @@ true                   {hashInsert(hashTable, yytext, LIT_TRUE); return LIT_TRUE
 
     /* Begin Comments */
 \/\/.*                  {}
-"/**/"                  { }
-"/*"[^ \t\n"*/"]*       { BEGIN COMMENT_BLOCK; }
+"/*"       { BEGIN COMMENT_BLOCK; }
 <COMMENT_BLOCK>"*/"     { BEGIN 0;}
 <COMMENT_BLOCK>\n       {nline++;}
 <COMMENT_BLOCK>.        {}
