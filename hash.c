@@ -5,8 +5,9 @@
 #define HASH_SIZE 11
 
 void hashPrint(HashTable *hash){
+    int i;
     printf("Hash Table:\n---------\n");
-    for(int i=0;i<HASH_SIZE;i++){
+    for(i=0;i<HASH_SIZE;i++){
         HashTable *curHash=&hash[i];
         if(curHash->value){
             printf("New Hash Index:\n");
@@ -28,8 +29,9 @@ HashTable *hashInit(){
 }
 
 int hashCalculate(char *value){
+    int i;
     int hashIndex = 1;
-    for(int i=0; i<strlen(value)-1; i++) hashIndex*=value[i];
+    for(i=0; i<strlen(value)-1; i++) hashIndex*=value[i];
     return hashIndex % HASH_SIZE;
 }
 

@@ -2,8 +2,10 @@
 #include "hash.h"
 #include "util.h"
 
-HashTable *hashTable;
-int running; //TODO Perguntar para o professor
+extern HashTable *hashTable;
+extern int running; //TODO Perguntar para o professor
+
+int yylex();
 
 int main(){
     int lexReturn;
