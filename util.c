@@ -1,9 +1,20 @@
+#include <stdio.h>
 #include "util.h"
 
 int running;
 int nline;
 HashTable *hashTable;
 int commentControl;
+
+
+
+int yyerror(char *s) { 
+
+ fprintf(stderr, "%s\n", s); 
+
+ return 0; 
+
+} 
 
 
 

@@ -9,10 +9,11 @@ extern HashTable *hashTable;
 
 extern int commentControl;
 
-
 // Methods
 
 void initMe();
 int getLineNumber();
+
+int yyerror();
 
 #endif

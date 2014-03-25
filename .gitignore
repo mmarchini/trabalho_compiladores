@@ -1,3 +1,5 @@
 *.o
 analisador
-etapas
+etapa*
+y.tab.*
+lex.*
