@@ -20,7 +20,7 @@
 \n      nline++;
 
     /* Operators */
-[,;:()-/<>=!&\{\}\[\]\+\*\$]      return yytext[0];
+[,;:()-/<>=!&\{\}\[\]\+\*\$]      {yylval=yytext; return yytext[0];}
 
 \<=      return OPERATOR_LE;
 >=       return OPERATOR_GE;
@@ -45,14 +45,14 @@ return   return KW_RETURN;
     /* Literals */
 
     /* Booleans */
-false                  {hashInsert(hashTable, yytext, LIT_FALSE); return LIT_FALSE;}
-true                   {hashInsert(hashTable, yytext, LIT_TRUE); return LIT_TRUE;} 
+false                           {yylval=yytext;hashInsert(hashTable, yytext, LIT_FALSE); return LIT_FALSE;}
+true                            {yylval=yytext;hashInsert(hashTable, yytext, LIT_TRUE); return LIT_TRUE;} 
 
     /* Integers */
-[0-9]*                 {hashInsert(hashTable, yytext, LIT_INTEGER); return LIT_INTEGER;} 
+[0-9]*                          {yylval=yytext;hashInsert(hashTable, yytext, LIT_INTEGER); return LIT_INTEGER;} 
 
     /* Characters */
-'.'                    {char auxChar[2]; auxChar[0]=yytext[1]; auxChar[1]='\0'; hashInsert(hashTable, auxChar, LIT_INTEGER); return LIT_CHAR;}
+'.'                             {yylval=yytext;char auxChar[2]; auxChar[0]=yytext[1]; auxChar[1]='\0'; hashInsert(hashTable, auxChar, LIT_INTEGER); return LIT_CHAR;}
 
     /* Identifiers */
 [0-9]*[_a-zA-Z]+[_a-zA-Z0-9_]*  {yylval=yytext; hashInsert(hashTable, yytext, TK_IDENTIFIER); return TK_IDENTIFIER;}

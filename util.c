@@ -12,7 +12,7 @@ int yyerror(char *s) {
 
  fprintf(stderr, "%s\n", s); 
 
- return 0; 
+ exit(3); 
 
 } 
 
