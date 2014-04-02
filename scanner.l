@@ -92,7 +92,7 @@ true                            {yylval.symbol=hashInsert(hashTable, yytext, SYM
 <COMMENT_BLOCK>.        {}
     /* End Comments */
 
-<<EOF>>      {hashPrint(hashTable);exit(0);}
+<<EOF>>      {exit(0);}
 
 .      { return TOKEN_ERROR; } 
 
