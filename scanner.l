@@ -20,7 +20,7 @@
 \n      nline++;
 
     /* Operators */
-[,;:()-/<>=!&\{\}\[\]\+\*\$]      {yylval=yytext; return yytext[0];}
+[,;:()-/<>=!&\{\}\[\]\+\*\$]      {yylval.symbol=yytext; return yytext[0];}
 
 \<=      return OPERATOR_LE;
 >=       return OPERATOR_GE;
@@ -45,17 +45,17 @@ return   return KW_RETURN;
     /* Literals */
 
     /* Booleans */
-false                           {yylval=yytext;hashInsert(hashTable, yytext, LIT_FALSE); return LIT_FALSE;}
-true                            {yylval=yytext;hashInsert(hashTable, yytext, LIT_TRUE); return LIT_TRUE;} 
+false                           {yylval.symbol=yytext;hashInsert(hashTable, yytext, LIT_FALSE); return LIT_FALSE;}
+true                            {yylval.symbol=yytext;hashInsert(hashTable, yytext, LIT_TRUE); return LIT_TRUE;} 
 
     /* Integers */
-[0-9]*                          {yylval=yytext;hashInsert(hashTable, yytext, LIT_INTEGER); return LIT_INTEGER;} 
+[0-9]*                          {yylval.symbol=yytext;hashInsert(hashTable, yytext, LIT_INTEGER); return LIT_INTEGER;} 
 
     /* Characters */
-'.'                             {yylval=yytext;char auxChar[2]; auxChar[0]=yytext[1]; auxChar[1]='\0'; hashInsert(hashTable, auxChar, LIT_INTEGER); return LIT_CHAR;}
+'.'                             {yylval.symbol=yytext;char auxChar[2]; auxChar[0]=yytext[1]; auxChar[1]='\0'; hashInsert(hashTable, auxChar, LIT_INTEGER); return LIT_CHAR;}
 
     /* Identifiers */
-[0-9]*[_a-zA-Z]+[_a-zA-Z0-9_]*  {yylval=yytext; hashInsert(hashTable, yytext, TK_IDENTIFIER); return TK_IDENTIFIER;}
+[0-9]*[_a-zA-Z]+[_a-zA-Z0-9_]*  {yylval.symbol=yytext; hashInsert(hashTable, yytext, TK_IDENTIFIER); return TK_IDENTIFIER;}
 
     /* Begin String Rule */
 \" { BEGIN STRING; s = buf; } 
@@ -85,7 +85,7 @@ true                            {yylval=yytext;hashInsert(hashTable, yytext, LIT
 <COMMENT_BLOCK>.        {}
     /* End Comments */
 
-<<EOF>>      {running=0; return;}
+<<EOF>>      {exit(0);}
 
 .      { return TOKEN_ERROR; } 
 

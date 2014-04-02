@@ -1,11 +1,11 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "util.h"
 
 int running;
 int nline;
 HashTable *hashTable;
 int commentControl;
-
 
 
 int yyerror(char *s) { 

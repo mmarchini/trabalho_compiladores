@@ -25,131 +25,159 @@
 
 %token TOKEN_ERROR
 
+%union {
+    char *symbol;
+    int integer;
+}
+
+%{
+#include <stdio.h>
+%}
+
+%start program
+
 %%
 
-program:
-       global_var  {}
-       global_func {}
-       |
-       ;
 
+program     : global_var ';' program     {printf("Var: '%s'\n", $$);}
+            | def_func   ';' program     {}
+            ;    
 
+    /* Variáveis */
 
-type:
-     KW_WORD     { $$ = "word"; }
-     | KW_BOOL   { $$ = "bool"; }
-     | KW_BYTE   { $$ = "byte"; }
-     |
-     ;
-
-identifier:
-          TK_IDENTIFIER {printf("Identifier: %s\n", $1);$$ = $1;  }
-          |
-          ;
-
-
-
-
-boolean:
-       LIT_FALSE   {}
-       | LIT_TRUE    {}
-       |
-       ;
-
-
-literal:
-       LIT_INTEGER     {printf("Literal: %s\n", $1); $$ = $1;}
-       | boolean       {printf("Literal: %s\n", $1); $$ = $1;}
-       | LIT_CHAR      {printf("Literal: %s\n", $1); $$ = $1;}
-       | LIT_STRING    {printf("Literal: %s\n", $1); $$ = $1;}
-       |
-       ;
-
-
-
-
-
-global_var:
-         type identifier ':' literal ';' { }
-         |
-         ;
-
-
-
-
-
-def_func:
-        header_func var_func command_block {}
-        |
-        ;
-
-header_func:
-           type identifier '(' header_parameters ')'  {}
-           |
+global_var : type identifier ':' literal         { printf("a: '%s' '%s' '%s' '%s' \n", $$, $1, $2, $4);}
+           | type identifier '[' LIT_INTEGER ']' { printf("b: '%s'\n", $$);}
+           | type identifier '[' LIT_INTEGER ']' ':' array_initializer  { printf("c:'%s'\n", $$);}
+           | type '$' identifier ':' literal     { printf("d: '%s'\n", $$);}
            ;
 
-header_parameters:
-                 type identifier {}
-                 | header_parameters ',' header_parameter {}
+array_initializer: literal array_initializer {}
                  |
                  ;
 
-var_func:
-        global_var {}
-        var_func global_var {}
-        |
+
+    /* Funçõs */
+
+def_func: header_func command {printf("DEF FUNC\n");}
         ;
 
-command_block:
-             '{' command_sequence '}' {}
-             |
-             ;
 
-command_sequence:
-                
 
-commands:
-        command_block {}
-        | attribution   {}
-        | input         {}
-        | output        {}
-        | return        {}
-        | if_block      {}
-        | loop_block    {}
-        |
-        ;
-
-attribution:
-           identifier '=' expr {}
-           |
+header_func: type identifier '(' header_parameters ')'  { printf("header:'%s' '%s'  '%s' '%s' \n", $$, $1, $2, $3); }
            ;
 
-input:
-     KW_INPUT identifier {}
-     |
-     ;
+header_parameters: type identifier {}
+                 | type identifier ',' header_parameters {}
+                 |
+                 ;
 
-output:
-     KW_OUTPUT identifier {}
-     |
-     ;
+    /* Comandos */
 
-return:
-     KW_RETURN identifier {}
-     |
-     ;
+command_block : '{' command_sequence '}' {printf("command_block\n");}
+              | '{'  '}'                 {printf("empty block\n");}
+              ;
+    
+command_sequence: command {printf("command_sequence1\n");}
+                | command command_sequence {printf("command_sequence2\n");}
+                ;
+                
 
-if_block:
-        KW_IF '(' expr ')' KW_THEN commands {}
-        | if_block KW_ELSE commands {}
-        |
+command : command_block   {}
+        | attribution     {}
+        | input           {}
+        | output          {printf("command\n");}
+        | return          {}
+        | if_block        {}
+        | loop_block      {}
         ;
 
-loop_block:
-          KW_LOOP '(' expr ')' commands {}
-          |
-          ;
+attribution: identifier '=' expr {}
+           | identifier '[' expr  ']' '=' expr {}
+           ;
 
+input: KW_INPUT identifier {}
+     ;
+
+output: KW_OUTPUT output_params { printf("OUTPUT\n"); }
+      ;
+
+output_params : LIT_STRING {}
+              | LIT_STRING ',' output_params {printf("string");}
+              | expr {}
+              | expr ',' output_params     {printf("expr");}
+              |
+              ;
+
+return : KW_RETURN expr {}
+       ;
+
+operator : boolean_operator      {}
+         | arithmetic_operator {}
+         ;
+
+boolean_operator : '>'           {} 
+                 | '<'           {} 
+                 | '!'           {} 
+                 | OPERATOR_LE   {} 
+                 | OPERATOR_GE   {} 
+                 | OPERATOR_EQ   {} 
+                 | OPERATOR_NE   {} 
+                 | OPERATOR_AND  {} 
+                 | OPERATOR_OR   {} 
+                 ;
+
+arithmetic_operator  : '+'    {}
+                     | '-'  {}
+                     | '*'  {}
+                     | '/'  {}
+                     ;
+
+call_params : expr {}
+            | expr ',' call_params {}
+            |
+            ;
+
+
+expr : expr operator expr             {}
+     | '(' expr ')'                   {}
+     | identifier '(' call_params ')' {}
+     | identifier                     {}
+     | identifier '[' expr ']'        {}
+     | LIT_INTEGER                    {}
+     | boolean                        {}
+     | LIT_CHAR                       {}
+     ;
+
+
+if_block : KW_IF '(' expr ')' KW_THEN command {}
+         | KW_IF '(' expr ')' KW_ELSE command KW_THEN command {}
+         ;
+
+loop_block : KW_LOOP  command '(' expr ')' {}
+           ;
+
+    /* Aliases */
+
+type : KW_WORD              {$$.symbol = "word";}
+     | KW_BOOL              {$$.symbol = "bool";}
+     | KW_BYTE              {$$.symbol = "byte";}
+     ;
+
+
+identifier :  TK_IDENTIFIER { printf("Ident: '%s' '%s'\n", $$, $1);}
+           ;
+
+
+boolean : LIT_FALSE         { }
+        | LIT_TRUE          { }
+        ;
+
+
+literal : LIT_INTEGER       { }
+        | boolean           { }
+        | LIT_CHAR          { }
+        | LIT_STRING        { }
+        ;
 
 %%
 
