@@ -1,6 +1,7 @@
 %{
-    #include "y.tab.h"
     #include "hash.h"
+    #include "symbols.h"
+    #include "y.tab.h"
     #include "util.h"
 
     int running;
@@ -20,7 +21,7 @@
 \n      nline++;
 
     /* Operators */
-[,;:()-/<>=!&\{\}\[\]\+\*\$]      {yylval.symbol=yytext; return yytext[0];}
+[,;:()-/<>=!&\{\}\[\]\+\*\$]      { return yytext[0];}
 
 \<=      return OPERATOR_LE;
 >=       return OPERATOR_GE;
@@ -45,17 +46,23 @@ return   return KW_RETURN;
     /* Literals */
 
     /* Booleans */
-false                           {yylval.symbol=yytext;hashInsert(hashTable, yytext, LIT_FALSE); return LIT_FALSE;}
-true                            {yylval.symbol=yytext;hashInsert(hashTable, yytext, LIT_TRUE); return LIT_TRUE;} 
+false                           {yylval.symbol=hashInsert(hashTable, yytext, SYMBOL_LIT_FALSE); return LIT_FALSE;}
+true                            {yylval.symbol=hashInsert(hashTable, yytext, SYMBOL_LIT_TRUE); return LIT_TRUE;} 
 
     /* Integers */
-[0-9]*                          {yylval.symbol=yytext;hashInsert(hashTable, yytext, LIT_INTEGER); return LIT_INTEGER;} 
+[0-9]*                          {yylval.symbol=hashInsert(hashTable, yytext, SYMBOL_LIT_INTEGER); return LIT_INTEGER;} 
 
     /* Characters */
-'.'                             {yylval.symbol=yytext;char auxChar[2]; auxChar[0]=yytext[1]; auxChar[1]='\0'; hashInsert(hashTable, auxChar, LIT_INTEGER); return LIT_CHAR;}
+'.'                             {
+                                    char auxChar[2]; 
+                                    auxChar[0]=yytext[1]; 
+                                    auxChar[1]='\0'; 
+                                    yylval.symbol=hashInsert(hashTable, auxChar, SYMBOL_LIT_CHAR); 
+                                    return LIT_CHAR;
+                                }
 
     /* Identifiers */
-[0-9]*[_a-zA-Z]+[_a-zA-Z0-9_]*  {yylval.symbol=yytext; hashInsert(hashTable, yytext, TK_IDENTIFIER); return TK_IDENTIFIER;}
+[0-9]*[_a-zA-Z]+[_a-zA-Z0-9_]*  {yylval.symbol=hashInsert(hashTable, yytext, SYMBOL_IDENTIFIER); return TK_IDENTIFIER;}
 
     /* Begin String Rule */
 \" { BEGIN STRING; s = buf; } 
@@ -66,7 +73,7 @@ true                            {yylval.symbol=yytext;hashInsert(hashTable, yyte
 
     *s++ = '\0';
     *s = 0; 
-    hashInsert(hashTable, buf, LIT_STRING);
+    yylval.symbol=hashInsert(hashTable, buf, SYMBOL_LIT_STRING);
 
 
     BEGIN 0; 
@@ -85,7 +92,7 @@ true                            {yylval.symbol=yytext;hashInsert(hashTable, yyte
 <COMMENT_BLOCK>.        {}
     /* End Comments */
 
-<<EOF>>      {exit(0);}
+<<EOF>>      {hashPrint(hashTable);exit(0);}
 
 .      { return TOKEN_ERROR; } 
 

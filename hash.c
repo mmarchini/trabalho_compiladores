@@ -11,10 +11,10 @@ void hashPrint(HashTable *hash){
         HashTable *curHash=&hash[i];
         if(curHash->value){
             for(;curHash->next;curHash=curHash->next){
-                    printf("HASH[%i]: %s\n", i, curHash->value);
+                    printf("HASH[%i]{%i}: %s\n", i, curHash->code, curHash->value);
             }
             if(curHash->value)
-                printf("HASH[%i]: %s\n", i, curHash->value);
+                printf("HASH[%i]{%i}: %s\n", i, curHash->code, curHash->value);
         }
     }
 }
@@ -30,11 +30,11 @@ HashTable *hashInit(){
 int hashCalculate(char *value){
     int i;
     int hashIndex = 1;
-    for(i=0; i<strlen(value)-1; i++) hashIndex = (hashIndex*value[i])%HASH_SIZE + 1;
+    for(i=0; i<strlen(value); i++) hashIndex = (hashIndex*value[i])%HASH_SIZE + 1;
     return hashIndex - 1;
 }
 
-void hashInsert(HashTable *hash, char *value, int code){
+HashTable *hashInsert(HashTable *hash, char *value, int code){
     if(hashSearch(hash, value, code))
         return;
     int hashIndex = hashCalculate(value); 
@@ -56,6 +56,8 @@ void hashInsert(HashTable *hash, char *value, int code){
     curHash->value = calloc(1, strlen(value)+1);
     strcpy(curHash->value, value);
     curHash->code  = code;
+
+    return curHash;
 }
 
 HashTable *hashSearch(HashTable *hash, char *value, int code){

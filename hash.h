@@ -9,7 +9,7 @@ typedef struct _HashTable{
 
 HashTable *hashInit();
 
-void hashInsert(HashTable *hash, char *value, int code);
+HashTable *hashInsert(HashTable *hash, char *value, int code);
 
 HashTable *hashSearch(HashTable *hash, char *value, int code);
 

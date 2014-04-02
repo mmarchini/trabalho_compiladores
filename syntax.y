@@ -25,14 +25,15 @@
 
 %token TOKEN_ERROR
 
-%union {
-    char *symbol;
-}
-
 %{
 #include <stdio.h>
+#include "hash.h"
 %}
 
+
+%union {
+    HashTable *symbol;
+}
 %start program
 
 %%
