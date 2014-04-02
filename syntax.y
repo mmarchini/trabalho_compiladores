@@ -27,7 +27,6 @@
 
 %union {
     char *symbol;
-    int integer;
 }
 
 %{
@@ -39,16 +38,16 @@
 %%
 
 
-program     : global_var ';' program     {printf("Var: '%s'\n", $$);}
+program     : global_var ';' program     {}
             | def_func   ';' program     {}
             ;    
 
     /* Variáveis */
 
-global_var : type identifier ':' literal         { printf("a: '%s' '%s' '%s' '%s' \n", $$, $1, $2, $4);}
-           | type identifier '[' LIT_INTEGER ']' { printf("b: '%s'\n", $$);}
-           | type identifier '[' LIT_INTEGER ']' ':' array_initializer  { printf("c:'%s'\n", $$);}
-           | type '$' identifier ':' literal     { printf("d: '%s'\n", $$);}
+global_var : type identifier ':' literal         { }
+           | type identifier '[' LIT_INTEGER ']' { }
+           | type identifier '[' LIT_INTEGER ']' ':' array_initializer  { }
+           | type '$' identifier ':' literal     { }
            ;
 
 array_initializer: literal array_initializer {}
@@ -58,12 +57,12 @@ array_initializer: literal array_initializer {}
 
     /* Funçõs */
 
-def_func: header_func command {printf("DEF FUNC\n");}
+def_func: header_func command {}
         ;
 
 
 
-header_func: type identifier '(' header_parameters ')'  { printf("header:'%s' '%s'  '%s' '%s' \n", $$, $1, $2, $3); }
+header_func: type identifier '(' header_parameters ')'  {  }
            ;
 
 header_parameters: type identifier {}
@@ -73,22 +72,22 @@ header_parameters: type identifier {}
 
     /* Comandos */
 
-command_block : '{' command_sequence '}' {printf("command_block\n");}
-              | '{'  '}'                 {printf("empty block\n");}
+command_block : '{' command_sequence '}' {}
               ;
     
-command_sequence: command {printf("command_sequence1\n");}
-                | command command_sequence {printf("command_sequence2\n");}
+command_sequence: command {}
+                | command command_sequence {}
                 ;
                 
 
 command : command_block   {}
         | attribution     {}
         | input           {}
-        | output          {printf("command\n");}
+        | output          {}
         | return          {}
         | if_block        {}
         | loop_block      {}
+        |
         ;
 
 attribution: identifier '=' expr {}
@@ -98,14 +97,13 @@ attribution: identifier '=' expr {}
 input: KW_INPUT identifier {}
      ;
 
-output: KW_OUTPUT output_params { printf("OUTPUT\n"); }
+output: KW_OUTPUT output_params {  }
       ;
 
 output_params : LIT_STRING {}
-              | LIT_STRING ',' output_params {printf("string");}
+              | LIT_STRING ',' output_params {}
               | expr {}
-              | expr ',' output_params     {printf("expr");}
-              |
+              | expr ',' output_params     {}
               ;
 
 return : KW_RETURN expr {}
@@ -140,8 +138,8 @@ call_params : expr {}
 
 expr : expr operator expr             {}
      | '(' expr ')'                   {}
-     | identifier '(' call_params ')' {}
      | identifier                     {}
+     | identifier '(' call_params ')' {}
      | identifier '[' expr ']'        {}
      | LIT_INTEGER                    {}
      | boolean                        {}
@@ -158,13 +156,13 @@ loop_block : KW_LOOP  command '(' expr ')' {}
 
     /* Aliases */
 
-type : KW_WORD              {$$.symbol = "word";}
-     | KW_BOOL              {$$.symbol = "bool";}
-     | KW_BYTE              {$$.symbol = "byte";}
+type : KW_WORD              {}
+     | KW_BOOL              {}
+     | KW_BYTE              {}
      ;
 
 
-identifier :  TK_IDENTIFIER { printf("Ident: '%s' '%s'\n", $$, $1);}
+identifier :  TK_IDENTIFIER { }
            ;
 
 
