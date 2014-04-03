@@ -12,7 +12,7 @@ scanner.o: main.c
 
 y.tab.o: syntax.y
 	@echo "Compilar o syntax.y"
-	@yacc -d syntax.y 
+	@bison syntax.y -d --file-prefix y
 	@gcc -c y.tab.c -o y.tab.o
 
 lex.yy.o: scanner.l

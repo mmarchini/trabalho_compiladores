@@ -34,12 +34,13 @@
 %union {
     HashTable *symbol;
 }
-%start program
 
 %%
 
 
-program     : global_var ';' program     {}
+program     : global_var {}
+            | def_func   {}
+            | global_var ';' program     {}
             | def_func   ';' program     {}
             ;    
 
