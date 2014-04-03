@@ -38,10 +38,9 @@
 %%
 
 
-program     : global_var {}
-            | def_func   {}
-            | global_var ';' program     {}
+program     : global_var ';' program     {}
             | def_func   ';' program     {}
+            |
             ;    
 
     /* Variáveis */
@@ -65,11 +64,11 @@ def_func: header_func command {}
 
 
 header_func: type identifier '(' header_parameters ')'  {  }
+           | type identifier '('                   ')'  {  }
            ;
 
 header_parameters: type identifier {}
                  | type identifier ',' header_parameters {}
-                 |
                  ;
 
     /* Comandos */
@@ -137,8 +136,13 @@ call_params : expr {}
             |
             ;
 
+unary_operator : '&' {}
+               | '$' {}
+               ;
+
 
 expr : expr operator expr             {}
+     | unary_operator expr            {}
      | '(' expr ')'                   {}
      | identifier                     {}
      | identifier '(' call_params ')' {}
