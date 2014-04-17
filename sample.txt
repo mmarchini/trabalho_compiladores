@@ -29,7 +29,7 @@ word incn (word x, word n)
   return x+n;
   
 word incn (word x)
-  ;
+  {};
 
 word outra (word x, word n) 
   if (x < n) else return x then return x+n;

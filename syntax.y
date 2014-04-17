@@ -74,6 +74,7 @@ header_parameters: type identifier {}
     /* Comandos */
 
 command_block : '{' command_sequence '}' {}
+              | '{'  '}' {}
               ;
     
 command_sequence: command {}
@@ -88,7 +89,6 @@ command : command_block   {}
         | return          {}
         | if_block        {}
         | loop_block      {}
-        |
         ;
 
 attribution: identifier '=' expr {}
