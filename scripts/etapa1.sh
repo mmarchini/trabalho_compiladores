@@ -5,7 +5,7 @@ fi
 mkdir tmp;
 
 # Copia os arquivos para a pasta tmp e entra na pasta tmp
-for file in "hash.c hash.h main.c Makefile scanner.l syntax.y symbols.h util.c util.h"
+for file in "ast.c ast.h hash.c hash.h main.c Makefile scanner.l syntax.y symbols.h util.c util.h"
 do
     cp $file tmp/;
     cp $file tmp/;
@@ -15,24 +15,24 @@ cd tmp;
 
 # Compacta os arquivos da pasta tmp e move ele para a raiz
 tar cvzf .temporary_file.tgz .;
-mv .temporary_file.tgz ../etapa2.tgz ;
+mv .temporary_file.tgz ../etapa3.tgz ;
 
 # Volta para a raiz e move o arquivo para a pasta etapas
 cd ..;
 if [ ! -d "etapas" ]; then
     mkdir etapas;
 fi
-if [ -f "etapas/etapa2.tgz" ]; then
-    rm -f etapas/etapa2.tgz;
+if [ -f "etapas/etapa3.tgz" ]; then
+    rm -f etapas/etapa3.tgz;
 fi
-mv etapa2.tgz etapas;
+mv etapa3.tgz etapas;
 
 # Remove a pasta tmp
 rm -rf tmp;
 
 # Tenta sincronizar o arquivo com o servidor
 if [ ! -z "$1" ]; then
-    rsync etapas/etapa2.tgz $1@html.inf.ufrgs.br:/home/grad/$1/public_html/etapa2.tgz;
+    rsync etapas/etapa3.tgz $1@html.inf.ufrgs.br:/home/grad/$1/public_html/etapa3.tgz;
 fi
 
 

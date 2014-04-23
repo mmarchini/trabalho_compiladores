@@ -29,6 +29,8 @@
 #include <stdio.h>
 #include "hash.h"
 #include "ast.h"
+
+extern FILE *outputFile;
 %}
 
 
@@ -78,7 +80,7 @@
 
 %%
 
-root        : program {printf("%s", astPrintFile($1, 0));}
+root        : program {if(outputFile) fprintf(outputFile, "%s", astPrintFile($1, 0)); else printf("%s", astPrintFile($1, 0));}
             ;
 
 program     : global_var ';' program     { $$ = astCreate(AST_program, NULL, $1, $3, NULL, NULL); }

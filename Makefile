@@ -1,6 +1,6 @@
 all: util.o ast.o hash.o y.tab.o lex.yy.o scanner.o
 	@echo "Montando o scanner"
-	@gcc -g util.o ast.o main.o lex.yy.o y.tab.o hash.o -L . -o etapa2 
+	@gcc -g util.o ast.o main.o lex.yy.o y.tab.o hash.o -L . -o etapa3 
 
 util.o: util.c util.h
 	@echo "Compilando a tabela Hash"
@@ -29,4 +29,4 @@ ast.o: ast.c ast.h
 	@gcc -g -c ast.c -o ast.o
 
 clean:
-	@rm -f lex.yy.* *.o etapa2 y.tab.* 
+	@rm -f lex.yy.* *.o etapa3 y.tab.* 
