@@ -13,16 +13,17 @@ word main()
   loop 
     {
     a = incn(a,1)
-    b = incn(a)
+    b = incn(a) + a
     c[4+x] = incn()
     c[ture && 'l'] = 2 
     c[ture >= 'l'] = 'd' 
     c[ture >= 'l'] = 'd' < true
     a = $b
     b = &a
-    i = i + 1
+    i = i + 4
+    i = i + ( x - 5 ) + 4
     } (i<10)
-  output "Incrementado algumas vezes fica ",a,"\n"
+  output "Incrementado algumas vezes fica ",a
   };
 
 word incn (word x, word n)

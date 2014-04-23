@@ -1,4 +1,5 @@
 %{
+    #include "ast.h"
     #include "hash.h"
     #include "symbols.h"
     #include "y.tab.h"
@@ -92,7 +93,7 @@ true                            {yylval.symbol=hashInsert(hashTable, yytext, SYM
 <COMMENT_BLOCK>.        {}
     /* End Comments */
 
-<<EOF>>      {exit(0);}
+<<EOF>>      {return 0;}
 
 .      { return TOKEN_ERROR; } 
 
