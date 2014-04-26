@@ -20,6 +20,7 @@
 
 [ \t]   ;
 \n      nline++;
+"\r\n"      nline++;
 
     /* Operators */
 [,;:()-/<>=!&\{\}\[\]\+\*\$]      { return yytext[0];}

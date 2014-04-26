@@ -35,10 +35,12 @@ int hashCalculate(char *value){
 }
 
 HashTable *hashInsert(HashTable *hash, char *value, int code){
-    if(hashSearch(hash, value, code))
-        return;
+    HashTable *curHash = NULL;
     int hashIndex = hashCalculate(value); 
-    HashTable *curHash = &hash[hashIndex];
+    curHash = hashSearch(hash, value, code);
+    if(curHash)
+        return curHash;
+    curHash = &hash[hashIndex];
 
     // Busca o último elemento daquele slot;
     for(

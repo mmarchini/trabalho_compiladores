@@ -236,14 +236,11 @@ char *astPrintFile(ASTNode *root){
 
             //
             case AST_identifier : 
-                if(!root->hashValue) {exit(1);}
                 return root->hashValue->value;
             case AST_vet_ident   : 
-                if(!root->hashValue) {exit(1);}
                 sprintf(auxStr, "%s [%s]", root->hashValue->value, astPrintFile(root->children[0]));
                 return auxStr;
             case AST_call_ident  :
-                if(!root->hashValue) {exit(1);}
                 if(root->children[0]){
                     sprintf(auxStr, "%s ( %s )", root->hashValue->value, astPrintFile(root->children[0]));
                 }
@@ -266,11 +263,9 @@ char *astPrintFile(ASTNode *root){
 
             //Literals
             case AST_lit_char  :
-                if(!root->hashValue) {exit(1);}
                 sprintf(auxStr, "'%s'", root->hashValue->value);
                 return auxStr;
             case AST_lit_int   :
-                if(!root->hashValue) {exit(1);}
                 sprintf(auxStr, "%s", root->hashValue->value);
                 return auxStr;
             case AST_lit_true  :
@@ -278,22 +273,18 @@ char *astPrintFile(ASTNode *root){
             case AST_lit_false :
                 return "false";
             case AST_lit_string :
-                if(!root->hashValue) {exit(1);}
                 sprintf(auxStr, "\"%s\"", root->hashValue->value);
                 return auxStr;
             //Attribution
             case AST_attr_ident :
-                if(!root->hashValue) {exit(1);}
                 sprintf(auxStr, "%s = %s", root->hashValue->value, astPrintFile(root->children[0]));
                 return auxStr;
             case AST_attr_array :
-                if(!root->hashValue) {exit(1);}
                 sprintf(auxStr, "%s[%s] = %s", root->hashValue->value, astPrintFile(root->children[0]), astPrintFile(root->children[1]));
                 return auxStr;
 
             //
             case AST_input  :
-                if(!root->hashValue) {exit(1);}
                 sprintf(auxStr, "input %s", root->hashValue->value);
                 return auxStr;
             case AST_output :
@@ -307,7 +298,6 @@ char *astPrintFile(ASTNode *root){
                         sprintf(auxStr, "%s", astPrintFile(root->children[0]));
                 }
                 else {
-                    if(!root->hashValue) {exit(1);}
                     if(root->children[1]){
                         sprintf(auxStr, "\"%s\",  %s", root->hashValue->value, astPrintFile(root->children[1]));
                     }
@@ -363,15 +353,12 @@ char *astPrintFile(ASTNode *root){
                 return "byte";
 
             case AST_var    :
-                if(!root->hashValue) {exit(1);}
                 sprintf(auxStr, "%s %s : %s", astPrintFile(root->children[0]), root->hashValue->value, astPrintFile(root->children[1]));
                 return auxStr;
             case AST_pt_var     :
-                if(!root->hashValue) {exit(1);}
                 sprintf(auxStr, "%s $ %s : %s", astPrintFile(root->children[0]), root->hashValue->value, astPrintFile(root->children[1]));
                 return auxStr;
             case AST_array_var  :
-                if(!root->hashValue) {exit(1);}
                 if(root->children[2]){
                     sprintf(auxStr, "%s %s [ %s ] : %s", astPrintFile(root->children[0]), root->hashValue->value, astPrintFile(root->children[1]), astPrintFile(root->children[2]));
                 }
@@ -393,7 +380,6 @@ char *astPrintFile(ASTNode *root){
                 sprintf(auxStr, "%s %s", astPrintFile(root->children[0]), astPrintFile(root->children[1]));
                 return auxStr;
             case AST_head_func  :
-                if(!root->hashValue) {exit(1);}
                 if(root->children[1]){
                     sprintf(auxStr, "%s %s ( %s )", astPrintFile(root->children[0]), root->hashValue->value, astPrintFile(root->children[1]));
                 }
@@ -402,7 +388,6 @@ char *astPrintFile(ASTNode *root){
                 }
                 return auxStr;
             case AST_head_param :
-                if(!root->hashValue) {exit(1);}
                 if(root->children[1]){
                     sprintf(auxStr, "%s %s,  %s", astPrintFile(root->children[0]), root->hashValue->value, astPrintFile(root->children[1]));
                 }

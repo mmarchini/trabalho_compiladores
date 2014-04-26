@@ -1,8 +1,7 @@
 // UFRGS - Compiladores - Marcelo Johann - 2014/1
 
-word a:0;
-word v[10]:0 0 0 0 0 0 0 0 0 0; 
-word v[5]:0; 
+byte v[10]:0 0 0 0 0 0 0 0 0 0; 
+bool v[5]:0; 
 word mat[1000];
 word $pt:'a';
 word $pt:true;

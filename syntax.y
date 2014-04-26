@@ -80,7 +80,7 @@ extern FILE *outputFile;
 
 %%
 
-root        : program {if(outputFile) fprintf(outputFile, "%s", astPrintFile($1, 0)); else printf("%s", astPrintFile($1, 0));}
+root        : program {if(outputFile) fprintf(outputFile, "%s", astPrintFile($1)); else printf("%s", astPrintFile($1));}
             ;
 
 program     : global_var ';' program     { $$ = astCreate(AST_program, NULL, $1, $3, NULL, NULL); }
