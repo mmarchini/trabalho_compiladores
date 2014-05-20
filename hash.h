@@ -1,9 +1,19 @@
 #ifndef _HASH
 #define _HASH
 
+typedef enum {
+    DT_UNDEFINED = 0, 
+    DT_BYTE = 1, 
+    DT_WORD = 2, 
+    DT_CHAR = 3, 
+    DT_STRING = 4, 
+    DT_BOOL = 5
+}DataType;
+
 typedef struct _HashTable{
     char *value;
     int code;
+    DataType type;
     struct _HashTable *next;
 } HashTable;
 

@@ -1,9 +1,9 @@
 
 EXTRA_PARAMS=--std=c99
 
-all: util.o ast.o hash.o y.tab.o lex.yy.o scanner.o
+all: util.o ast.o hash.o y.tab.o lex.yy.o scanner.o semantic.o
 	@echo "Montando o scanner"
-	@gcc ${EXTRA_PARAMS} util.o ast.o main.o lex.yy.o y.tab.o hash.o -L . -o etapa3 
+	@gcc ${EXTRA_PARAMS} semantic.o util.o ast.o main.o lex.yy.o y.tab.o hash.o -L . -o etapa4 
 
 util.o: util.c util.h
 	@echo "Compilando a tabela Hash"
@@ -23,9 +23,13 @@ lex.yy.o: scanner.l
 	@lex scanner.l
 	@gcc ${EXTRA_PARAMS} -c lex.yy.c -o lex.yy.o
 
+semantic.o: semantic.c semantic.h
+	@echo "compilando o analisador semântico"
+	@gcc ${extra_params} -c semantic.c -o semantic.o
+
 hash.o: hash.c hash.h
-	@echo "Compilando a tabela Hash"
-	@gcc ${EXTRA_PARAMS} -c hash.c -o hash.o
+	@echo "compilando a tabela hash"
+	@gcc ${extra_params} -c hash.c -o hash.o
 
 ast.o: ast.c ast.h
 	@echo "Compilando a tabela ast"

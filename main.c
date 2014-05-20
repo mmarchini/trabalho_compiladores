@@ -1,9 +1,12 @@
 #include <stdio.h>
 #include <string.h>
+#include "semantic.h"
+#include "ast.h"
 #include "hash.h"
 #include "util.h"
 
 extern HashTable *hashTable;
+extern ASTNode *ast;
 extern int running;
 extern FILE *yyin;
 
@@ -29,6 +32,11 @@ int main(int argn, char *args[]){
 
     yyparse();
 
-    return 0;
+    if(outputFile) 
+        fprintf(outputFile, "%s", astPrintFile(ast)); 
+    else 
+        astPrint(ast, 0); 
+
+    return check_semantic(ast, hashTable);
 }
 
