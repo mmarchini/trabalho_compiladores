@@ -11,7 +11,7 @@ fi
 exec_name=$1;
 exit_status=0;
 
-function do_test() {
+function do_test {
     local test_file=$1;
     local test_result=$2;
 
