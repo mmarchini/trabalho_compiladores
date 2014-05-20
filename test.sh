@@ -1,3 +1,5 @@
+#!/bin/bash
+
 if [ -z $1 ]; then
     echo "Executable not defined"
     exit 6;
