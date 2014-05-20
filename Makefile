@@ -37,7 +37,10 @@ ast.o: ast.c ast.h
 	@gcc ${EXTRA_PARAMS} -c ast.c -o ast.o
 
 test:
-	@./test.sh ${ETAPA}
+	@echo "Testing Syntax"
+	@./tests/syntax.sh ${ETAPA}
+	@echo "Testing Semantics"
+	@./tests/semantic.sh ${ETAPA}
 
 clean:
 	@rm -f lex.yy.* *.o etapa3 y.tab.* 

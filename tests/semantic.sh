@@ -12,6 +12,7 @@ fi
 
 exec_name=$1;
 exit_status=0;
+base_test_path="tests/semantic";
 
 function do_test {
     local test_file=$1;
@@ -31,7 +32,14 @@ function do_test {
     return
 }
 
-do_test test/sample.txt 0;
+for return_code in $(ls $base_test_path) 
+do
+    for _test_file in $(ls $base_test_path/$return_code)
+    do
+        do_test $base_test_path/$return_code/$_test_file $return_code;
+    done
+done
+
 
 if [ "$exit_status" == "0" ]; then
     echo "Test was successful!!"
