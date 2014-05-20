@@ -1,9 +1,10 @@
+ETAPA=etapa4
 
 EXTRA_PARAMS=--std=c99
 
 all: util.o ast.o hash.o y.tab.o lex.yy.o scanner.o semantic.o
 	@echo "Montando o scanner"
-	@gcc ${EXTRA_PARAMS} semantic.o util.o ast.o main.o lex.yy.o y.tab.o hash.o -L . -o etapa4 
+	@gcc ${EXTRA_PARAMS} semantic.o util.o ast.o main.o lex.yy.o y.tab.o hash.o -L . -o ${ETAPA} 
 
 util.o: util.c util.h
 	@echo "Compilando a tabela Hash"
@@ -34,6 +35,9 @@ hash.o: hash.c hash.h
 ast.o: ast.c ast.h
 	@echo "Compilando a tabela ast"
 	@gcc ${EXTRA_PARAMS} -c ast.c -o ast.o
+
+test:
+	@./test.sh ${ETAPA}
 
 clean:
 	@rm -f lex.yy.* *.o etapa3 y.tab.* 
