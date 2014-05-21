@@ -174,6 +174,8 @@ void check_def_func(ASTNode *ast){
     for(aux=ast->children[1];aux!=NULL;aux=aux->children[1]){
         check_var_redeclaration(aux);
     }
+
+    //TODO: Return check
 }
 
 DataType check_var_type(ASTNode *ast){
@@ -240,6 +242,9 @@ DataType check_expression(ASTNode *ast) {
             break;
         case AST_par_block:
             expr_type = check_expression(ast->children[1]->children[0]);
+            break;
+        case AST_call_ident:
+            //TODO: function call
             break;
         default:
             expr_type = DT_NULL;
@@ -331,8 +336,8 @@ int check_semantic(ASTNode *ast){
             check_attr_ident(ast);
             break;
         case AST_attr_array:
+            //TODO: Tests
             check_attr_array(ast);
-            //TODO
             break;
         default:
             break;
