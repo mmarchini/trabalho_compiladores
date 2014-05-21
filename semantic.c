@@ -117,6 +117,11 @@ bool compare_types(DataType type1, DataType type2){
     return true;
 }
 
+DataType check_function_call(ASTNode *ast) {
+
+    return check_var_type(ast);
+}
+
 DataType check_expression(ASTNode *ast) {
     DataType expr_type;
 
@@ -168,6 +173,7 @@ DataType check_expression(ASTNode *ast) {
             break;
         case AST_call_ident:
             //TODO: function call
+            expr_type = check_function_call(ast);
             break;
         default:
             expr_type = DT_NULL;
