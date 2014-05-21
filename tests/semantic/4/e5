@@ -1,0 +1,8 @@
+// UFRGS - Compiladores - Marcelo Johann - 2014/1
+
+word cha_lit:'a';
+
+word cha_lit()
+  {
+  };
+

@@ -1,7 +1,7 @@
 word a: 0 ;
 byte b: 0 ;
 word function () { } ;
-word function (	) { a=5 };
+word function2 (	) { a=5 };
 
 
 

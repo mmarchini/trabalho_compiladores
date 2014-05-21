@@ -28,13 +28,13 @@ word main()
 word incn (word x, word n)
   return x+n;
   
-word incn (word x)
+word incn2 (word x)
   {};
 
 word outra (word x, word n) 
   if (x < n) else return x then return x+n;
 
-word outra (word x, word n) 
+word nova (word x, word n) 
   if (x < n) then return x+n;
 
 word maisuma ()

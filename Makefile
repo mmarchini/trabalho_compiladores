@@ -26,7 +26,7 @@ lex.yy.o: scanner.l
 
 semantic.o: semantic.c semantic.h
 	@echo "compilando o analisador semântico"
-	@gcc ${extra_params} -c semantic.c -o semantic.o
+	@gcc ${EXTRA_PARAMS} -c semantic.c -o semantic.o
 
 hash.o: hash.c hash.h
 	@echo "compilando a tabela hash"

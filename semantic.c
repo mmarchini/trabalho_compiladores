@@ -180,6 +180,12 @@ int check_array_declaration(ASTNode *ast){
 
     var_type = check_var_redeclaration(ast);
 
+    if(ast->children[1] == NULL)
+        exit(10);
+    if(ast->children[1]->hashValue == NULL)
+        exit(11);
+    ast->children[1]->hashValue->type = DT_WORD;
+
     // Null array, can return now
     if(ast->children[2] == NULL)
         return 0;
@@ -196,8 +202,10 @@ int check_array_declaration(ASTNode *ast){
     return 0;
 }
 
-int check_def_func(ASTNode *ast){
-    return 0;
+void check_def_func(ASTNode *ast){
+    DataType var_type;
+
+    var_type = check_var_redeclaration(ast->children[0]);
 }
 
 int check_semantic(ASTNode *ast){
@@ -210,6 +218,9 @@ int check_semantic(ASTNode *ast){
             break;
         case AST_array_var:
             check_array_declaration(ast);
+            break;
+        case AST_def_func:
+            check_def_func(ast);
             break;
         default:
             break;

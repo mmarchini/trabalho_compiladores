@@ -1,0 +1,13 @@
+// UFRGS - Compiladores - Marcelo Johann - 2014/1
+
+byte byte_vec[3]:5 10 'a'; 
+word word_vec[3]:5 10 true; 
+word word_lit : 5;
+word cha_lit:'a';
+
+word main()
+  {
+    byte_vec[1] = byte_vec[0] / word_lit
+    output "Strins so aparecem em outputs!"
+  };
+
