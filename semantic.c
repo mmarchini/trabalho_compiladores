@@ -162,7 +162,30 @@ bool compare_types(DataType type1, DataType type2){
     return true;
 }
 
+DataType check_expression(ASTNode *ast); 
+
+void check_function_arguments(ASTNode *ast){
+    ASTNode *head_args=NULL, *params=NULL;
+    if(ast->children[0] != NULL)
+        params = ast->children[0]->children[0];
+    head_args = (ASTNode *)ast->hashValue->args;
+
+    while(head_args != NULL && params!=NULL){
+        if( !compare_types( check_var_type(head_args) , check_expression(params->children[0])) )
+            error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Invalid argument's type.");
+        params = params->children[1];
+        head_args = head_args->children[1];
+    }
+    if(params == NULL && head_args != NULL)
+        error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Function need's more arguments.");
+    if(params != NULL && head_args == NULL)
+        error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Function need's less arguments.");
+
+}
+
 DataType check_function_call(ASTNode *ast) {
+
+    check_function_arguments(ast);
 
     return check_var_type(ast);
 }
