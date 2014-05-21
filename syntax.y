@@ -167,34 +167,34 @@ params_list : expr                 {$$ = astCreate(AST_expr,  NULL,   $1,   NULL
             | expr ',' params_list {$$ = astCreate(AST_expr,  NULL,   $1,   $3, NULL, NULL);}
             ;
 
-expr : expr '>'          expr     {$$ = astCreate(AST_great,      NULL,   $1,   $3, NULL, NULL);} 
-     | expr '<'          expr     {$$ = astCreate(AST_less,       NULL,   $1,   $3, NULL, NULL);}
-     | expr OPERATOR_LE  expr     {$$ = astCreate(AST_le,         NULL,   $1,   $3, NULL, NULL);}
-     | expr OPERATOR_GE  expr     {$$ = astCreate(AST_ge,         NULL,   $1,   $3, NULL, NULL);}
-     | expr OPERATOR_EQ  expr     {$$ = astCreate(AST_eq,         NULL,   $1,   $3, NULL, NULL);}
-     | expr OPERATOR_NE  expr     {$$ = astCreate(AST_ne,         NULL,   $1,   $3, NULL, NULL);}
-     | expr OPERATOR_AND expr     {$$ = astCreate(AST_and,        NULL,   $1,   $3, NULL, NULL);} 
-     | expr OPERATOR_OR  expr     {$$ = astCreate(AST_or,         NULL,   $1,   $3, NULL, NULL);}  
-     | expr '+' expr              {$$ = astCreate(AST_add,        NULL,   $1,   $3, NULL, NULL);}  
-     | expr '-' expr              {$$ = astCreate(AST_sub,        NULL,   $1,   $3, NULL, NULL);}
-     | expr '*' expr              {$$ = astCreate(AST_mult,       NULL,   $1,   $3, NULL, NULL);}
-     | expr '/' expr              {$$ = astCreate(AST_div,        NULL,   $1,   $3, NULL, NULL);}
+expr : expr '>'          expr     {$$ = astCreate(AST_great,      NULL,   $1,   $3, NULL, NULL);} // 
+     | expr '<'          expr     {$$ = astCreate(AST_less,       NULL,   $1,   $3, NULL, NULL);} //
+     | expr OPERATOR_LE  expr     {$$ = astCreate(AST_le,         NULL,   $1,   $3, NULL, NULL);} //
+     | expr OPERATOR_GE  expr     {$$ = astCreate(AST_ge,         NULL,   $1,   $3, NULL, NULL);} //
+     | expr OPERATOR_EQ  expr     {$$ = astCreate(AST_eq,         NULL,   $1,   $3, NULL, NULL);} //
+     | expr OPERATOR_NE  expr     {$$ = astCreate(AST_ne,         NULL,   $1,   $3, NULL, NULL);} //
+     | expr OPERATOR_AND expr     {$$ = astCreate(AST_and,        NULL,   $1,   $3, NULL, NULL);} //
+     | expr OPERATOR_OR  expr     {$$ = astCreate(AST_or,         NULL,   $1,   $3, NULL, NULL);} //
+     | expr '+' expr              {$$ = astCreate(AST_add,        NULL,   $1,   $3, NULL, NULL);} //
+     | expr '-' expr              {$$ = astCreate(AST_sub,        NULL,   $1,   $3, NULL, NULL);} //
+     | expr '*' expr              {$$ = astCreate(AST_mult,       NULL,   $1,   $3, NULL, NULL);} //
+     | expr '/' expr              {$$ = astCreate(AST_div,        NULL,   $1,   $3, NULL, NULL);} //
      | '&' expr                   {$$ = astCreate(AST_address,    NULL,   $2, NULL, NULL, NULL);} 
      | '$' expr                   {$$ = astCreate(AST_pointer,    NULL,   $2, NULL, NULL, NULL);} 
-     | '!' expr                   {$$ = astCreate(AST_not,        NULL,   $2, NULL, NULL, NULL);}
-     | TK_IDENTIFIER              {$$ = astCreate(AST_identifier,   $1, NULL, NULL, NULL, NULL);}
-     | LIT_CHAR                   {$$ = astCreate(AST_lit_char,     $1, NULL, NULL, NULL, NULL);}
-     | LIT_INTEGER                {$$ = astCreate(AST_lit_int,      $1, NULL, NULL, NULL, NULL);}
-     | boolean                    {$$ = $1;}
-     | call                       {$$ = $1;}
-     | TK_IDENTIFIER '[' expr ']' {$$ = astCreate(AST_vet_ident,  $1, $3, NULL, NULL, NULL);}
+     | '!' expr                   {$$ = astCreate(AST_not,        NULL,   $2, NULL, NULL, NULL);} //
+     | TK_IDENTIFIER              {$$ = astCreate(AST_identifier,   $1, NULL, NULL, NULL, NULL);} // 
+     | LIT_CHAR                   {$$ = astCreate(AST_lit_char,     $1, NULL, NULL, NULL, NULL);} // 
+     | LIT_INTEGER                {$$ = astCreate(AST_lit_int,      $1, NULL, NULL, NULL, NULL);} //
+     | boolean                    {$$ = $1;} //
+     | call                       {$$ = $1;} //
+     | TK_IDENTIFIER '[' expr ']' {$$ = astCreate(AST_vet_ident,  $1, $3, NULL, NULL, NULL);} //
      | '(' expr ')'               {$$ = astCreate(AST_par_block, NULL, 
                                     astCreate(AST_left_par,  NULL, NULL, NULL, NULL, NULL),
                                     astCreate(AST_expr,      NULL,   $2, NULL, NULL, NULL),
                                     astCreate(AST_right_par, NULL, NULL, NULL, NULL, NULL),
                                     NULL
                                     );
-                                  } 
+                                  } //
      ;
 
 if_block : KW_IF '(' expr ')' KW_THEN command                 {$$ = astCreate(AST_if_block, NULL, $3, $6, NULL, NULL);}
