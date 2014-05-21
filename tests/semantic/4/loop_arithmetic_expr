@@ -1,0 +1,10 @@
+// UFRGS - Compiladores - Marcelo Johann - 2014/1
+
+word a:5;
+word b:5;
+
+word main()
+  {
+    loop {  } ( a + b ) 
+  };
+

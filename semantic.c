@@ -304,6 +304,10 @@ void check_attr_array(ASTNode *ast){
 
 }
 
+void check_input(ASTNode *ast){
+    check_var_type(ast);
+}
+
 int check_semantic(ASTNode *ast){
     if(ast==NULL)
         return 0;
@@ -326,7 +330,7 @@ int check_semantic(ASTNode *ast){
             check_loop_block(ast);
             break;
         case AST_input:
-            //TODO
+            check_input(ast);
             break;
         case AST_output:
             //TODO

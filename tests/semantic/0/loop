@@ -1,0 +1,26 @@
+// UFRGS - Compiladores - Marcelo Johann - 2014/1
+
+word a:5;
+word b:5;
+bool c:true;
+
+word main()
+  {
+    loop {
+    } ( a == b )
+    loop {
+    } ( a != b )
+    loop {
+    } ( a > b )
+    loop {
+    } ( a >= b )
+    loop {
+    } ( a < b )
+    loop {
+    } ( a <= b )
+    loop {
+    } ( ( (a * b) != (b/a) ) || c )
+    loop {
+    } ( ( (a * b) != (b/a) ) && ( c || !c ) )
+  };
+

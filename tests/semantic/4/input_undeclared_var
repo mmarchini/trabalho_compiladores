@@ -1,0 +1,14 @@
+// UFRGS - Compiladores - Marcelo Johann - 2014/1
+
+word a:5;
+word b:5;
+
+word main()
+  {
+    if ( a == b ) then {
+        input a
+        input b
+        input c
+    }
+  };
+
