@@ -1,10 +1,10 @@
 // UFRGS - Compiladores - Marcelo Johann - 2014/1
 
 byte v[10]:0 0 0 0 0 0 0 0 0 0; 
-bool v[5]:0; 
+bool v2[5]: true; 
 word mat[1000];
 word $pt:'a';
-word $pt:true;
+word $pt2:5;
 
 word main()
   {

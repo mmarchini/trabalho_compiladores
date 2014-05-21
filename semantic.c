@@ -75,10 +75,6 @@ int check_attribution(ASTNode *ast){
     return 0;
 }
 
-int check_array_declaration(ASTNode *ast){
-    return 0;
-}
-
 DataType set_literal_type(ASTNode *ast){
     switch(ast->type){
         case AST_lit_true:
@@ -177,6 +173,29 @@ int check_var_declaration(ASTNode *ast){
     return 0;
 }
 
+int check_array_declaration(ASTNode *ast){
+    DataType var_type, lit_type;
+    bool is_equal = true;
+    ASTNode *aux;
+
+    var_type = check_var_redeclaration(ast);
+
+    // Null array, can return now
+    if(ast->children[2] == NULL)
+        return 0;
+
+    for(aux=ast->children[2];aux!=NULL;aux=aux->children[1]){
+        lit_type = set_literal_type(aux->children[0]);
+        is_equal = is_equal && compare_types(var_type, lit_type);
+    }
+
+    if(!is_equal){
+        error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Literal's type didn't match variable's type.");
+    }
+
+    return 0;
+}
+
 int check_def_func(ASTNode *ast){
     return 0;
 }
@@ -186,7 +205,11 @@ int check_semantic(ASTNode *ast){
         return 0;
     switch(ast->type){
         case AST_var:
+        case AST_pt_var:
             check_var_declaration(ast);
+            break;
+        case AST_array_var:
+            check_array_declaration(ast);
             break;
         default:
             break;
