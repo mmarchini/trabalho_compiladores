@@ -59,6 +59,8 @@ HashTable *hashInsert(HashTable *hash, char *value, int code){
     strcpy(curHash->value, value);
     curHash->code  = code;
     curHash->type  = DT_NULL;
+    curHash->nature = DN_NULL;
+    curHash->args = NULL; // SUPERSAYAJIN HACK
 
 
     return curHash;

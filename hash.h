@@ -10,11 +10,22 @@ typedef enum {
     DT_BOOL = 4
 }DataType;
 
+typedef enum {
+    DN_INVALID= -1, 
+    DN_NULL = 0, 
+    DN_SCALAR = 1, 
+    DN_ARRAY = 2, 
+    DN_POINTER = 3, 
+    DN_FUNCTION = 4, 
+}DataNature;
+
 typedef struct _HashTable{
     char *value;
     int code;
     DataType type;
+    DataNature nature;
     struct _HashTable *next;
+    void *args;
 } HashTable;
 
 HashTable *hashInit();

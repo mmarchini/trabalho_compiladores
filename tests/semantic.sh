@@ -18,10 +18,14 @@ function do_test {
     local test_file=$1;
     local test_result=$2;
 
+    echo "================================================================================";
     echo "Excecuting test \"$test_file\" expecting return value equals to \"$test_result\"";
+    echo;
 
     echo | ./$exec_name $test_file;
     local given_result=$?;
+
+    echo;
 
     if [ "$given_result" != "$test_result" ]; then
         echo "Test $test_file failed."
@@ -29,6 +33,7 @@ function do_test {
         echo "Given exit: $given_result"
         exit_status=1;
     fi;
+    echo "================================================================================";
     return
 }
 

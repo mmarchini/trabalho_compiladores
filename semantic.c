@@ -37,6 +37,29 @@ SemanticError *error_queue;
 
 DataType check_var_type(ASTNode *ast){
 
+    switch(ast->type){
+        case AST_vet_ident:
+        case AST_attr_array:
+            if(ast->hashValue->nature != DN_ARRAY)
+                error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Trying to use something that is not an array as array.");
+            break;
+        case AST_identifier:
+        case AST_attr_ident:
+            if(ast->hashValue->nature != DN_SCALAR)
+                error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Trying to use something that is not an scalar as scalar.");
+            break;
+        case AST_call_ident:
+            if(ast->hashValue->nature != DN_FUNCTION)
+                error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Trying to use something that is not an function as function.");
+            break;
+        case AST_pointer:
+            if(ast->hashValue->nature != DN_POINTER)
+                error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Trying to use something that is not an pointer as pointer.");
+            break;
+        default:
+            break;
+    }
+
     if(ast->hashValue==NULL){
         ast->hashValue->type = DT_INVALID;
         error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Can't find declared variable in the declaration's table.");
@@ -77,6 +100,7 @@ DataType set_literal_type(ASTNode *ast){
 }
 
 DataType set_var_type(ASTNode *ast){
+    // Identifiers Type 
     switch(ast->children[0]->type){
         case AST_type_byte:
             ast->hashValue->type = DT_BYTE;
@@ -90,6 +114,27 @@ DataType set_var_type(ASTNode *ast){
         default:
             ast->hashValue->type = DT_INVALID;
             error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Invalid variable's type.");
+            break;
+    }
+
+    // Identifiers Nature 
+    switch(ast->type){
+        case AST_var:
+        case AST_head_param:
+            ast->hashValue->nature = DN_SCALAR;
+            break;
+        case AST_array_var:
+            ast->hashValue->nature = DN_ARRAY;
+            break;
+        case AST_pt_var:
+            ast->hashValue->nature = DN_POINTER;
+            break;
+        case AST_head_func:
+            ast->hashValue->nature = DN_FUNCTION;
+            break;
+        default:
+            ast->hashValue->nature = DN_INVALID;
+            error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Invalid variable's nature.");
             break;
     }
 
@@ -254,10 +299,13 @@ DataType check_head_func(ASTNode *ast){
     return_type = check_var_redeclaration(ast);
 
     // Check parameters
-    if(ast->children[1] != NULL)
+    
+    if(ast->children[1] != NULL){
+        ast->hashValue->args = (void *)ast->children[1];
         for(aux=ast->children[1];aux!=NULL;aux=aux->children[1]){
             check_var_redeclaration(aux);
         }
+    }
     return return_type; 
 }
 
