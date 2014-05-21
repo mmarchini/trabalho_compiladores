@@ -1,0 +1,14 @@
+// UFRGS - Compiladores - Marcelo Johann - 2014/1
+
+word a:5;
+bool c:true;
+
+word main()
+  {
+    if ( a == b ) then {
+        output "Eu sou uma string"
+        output a, b
+        output a, "so um detalhe", b
+    }
+  };
+

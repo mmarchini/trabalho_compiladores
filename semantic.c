@@ -305,8 +305,27 @@ void check_attr_array(ASTNode *ast){
 }
 
 void check_input(ASTNode *ast){
-    check_var_type(ast);
+    if(compare_types(check_var_type(ast), DT_BOOL)){
+        error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Can't use bool variables in input.");
+    }
+
 }
+
+int check_output(ASTNode *ast){
+    DataType var_type, lit_type;
+    ASTNode *aux;
+
+    for(aux=ast->children[0];aux!=NULL;aux=aux->children[1]){
+            if(aux->children[0] == NULL){
+            }
+            else
+                check_expression(aux->children[0]);
+    }
+
+    return 0;
+}
+
+
 
 int check_semantic(ASTNode *ast){
     if(ast==NULL)
@@ -333,6 +352,7 @@ int check_semantic(ASTNode *ast){
             check_input(ast);
             break;
         case AST_output:
+            check_output(ast);
             //TODO
             break;
         case AST_attr_ident:

@@ -1,14 +1,13 @@
 // UFRGS - Compiladores - Marcelo Johann - 2014/1
 
 word a:5;
-word b:5;
 bool c:true;
 
 word main()
   {
     if ( c ) then {
         input a
-        input b
+        input c 
     }
   };
 
