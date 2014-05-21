@@ -2,6 +2,8 @@
 #include "util.h"
 #include "ast.h"
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 // I hate globals, but this will give me some extra time
 SemanticError *error_queue;
@@ -77,22 +79,31 @@ int check_array_declaration(ASTNode *ast){
     return 0;
 }
 
-void check_var_redeclaration(ASTNode *ast){
-
-    if(ast->hashValue==NULL){
-        error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Can't find declared variable in the declaration's table.");
-        return ;
+DataType set_literal_type(ASTNode *ast){
+    switch(ast->type){
+        case AST_lit_true:
+        case AST_lit_false:
+            ast->hashValue->type = DT_BOOL;
+            break;
+        case AST_lit_char:
+            ast->hashValue->type = DT_BYTE;
+            break;
+        case AST_lit_int:
+            ast->hashValue->type = DT_WORD;
+            break;
+        case AST_lit_string:
+            ast->hashValue->type = DT_STRING;
+            break;
+        default:
+            ast->hashValue->type = DT_INVALID;
+            error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Invalid literal's type.");
+            break;
     }
-    if(ast->children[0] == NULL){
-        error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Can't determine declared variable's type.");
-        return ;
-    }
-    if(ast->hashValue->type!= DT_NULL){
-        error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Redefinition of declared variable.");
-        return ;
-    }
 
+    return ast->hashValue->type;
+}
 
+DataType set_var_type(ASTNode *ast){
     switch(ast->children[0]->type){
         case AST_type_byte:
             ast->hashValue->type = DT_BYTE;
@@ -104,13 +115,65 @@ void check_var_redeclaration(ASTNode *ast){
             ast->hashValue->type = DT_BOOL;
             break;
         default:
+            ast->hashValue->type = DT_INVALID;
             error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Invalid variable's type.");
             break;
     }
+
+    return ast->hashValue->type;
+}
+
+DataType check_var_redeclaration(ASTNode *ast){
+
+    if(ast->hashValue==NULL){
+        ast->hashValue->type = DT_INVALID;
+        error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Can't find declared variable in the declaration's table.");
+        return ast->hashValue->type;
+    }
+    if(ast->children[0] == NULL){
+        ast->hashValue->type = DT_INVALID;
+        error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Can't determine declared variable's type.");
+        return ast->hashValue->type;
+    }
+    if(ast->hashValue->type!= DT_NULL){
+        error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Redefinition of declared variable.");
+        return ast->hashValue->type;
+    }
+
+    return set_var_type(ast);
+}
+
+bool compare_types(DataType type1, DataType type2){
+    switch (type1) {
+        case DT_WORD:
+        case DT_BYTE:
+            switch (type2){ 
+                case DT_WORD:
+                case DT_BYTE:
+                    break;
+                default:
+                    return false;
+            }
+            break;
+        default:
+            if(type1 != type2){
+                return false;
+            }
+            break;
+    }
+    return true;
 }
 
 int check_var_declaration(ASTNode *ast){
-    check_var_redeclaration(ast);
+    DataType var_type, lit_type;
+
+    var_type = check_var_redeclaration(ast);
+    lit_type = set_literal_type(ast->children[1]);
+
+    if(!compare_types(var_type, lit_type)){
+        error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Literal's type didn't match variable's type.");
+    }
+
     return 0;
 }
 

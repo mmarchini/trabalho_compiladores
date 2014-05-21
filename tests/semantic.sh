@@ -20,7 +20,7 @@ function do_test {
 
     echo "Excecuting test \"$test_file\" expecting return value equals to \"$test_result\"";
 
-    echo | ./$exec_name $test_file ;
+    echo | ./$exec_name $test_file;
     local given_result=$?;
 
     if [ "$given_result" != "$test_result" ]; then
