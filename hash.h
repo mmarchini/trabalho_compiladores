@@ -7,7 +7,8 @@ typedef enum {
     DT_BYTE = 1, 
     DT_WORD = 2, 
     DT_STRING = 3, 
-    DT_BOOL = 4
+    DT_BOOL = 4,
+    DT_ADDRESS = 10
 }DataType;
 
 typedef enum {

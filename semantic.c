@@ -45,7 +45,7 @@ DataType check_var_type(ASTNode *ast){
             break;
         case AST_identifier:
         case AST_attr_ident:
-            if(ast->hashValue->nature != DN_SCALAR)
+            if(ast->hashValue->nature != DN_SCALAR && ast->hashValue->nature != DN_POINTER)
                 error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Trying to use something that is not an scalar as scalar.");
             break;
         case AST_call_ident:
@@ -61,11 +61,10 @@ DataType check_var_type(ASTNode *ast){
     }
 
     if(ast->hashValue==NULL){
-        ast->hashValue->type = DT_INVALID;
         error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Can't find declared variable in the declaration's table.");
+        return DT_INVALID; 
     }
     if(ast->hashValue->type==DT_NULL){
-        ast->hashValue->type = DT_INVALID;
         error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Undeclared variable.");
     }
 
@@ -214,11 +213,34 @@ DataType check_expression(ASTNode *ast) {
         case AST_ne:
             if( !compare_types(check_expression(ast->children[0]), check_expression(ast->children[1])) )
                 error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Invalid operators for comparation expression.");
+            if( compare_types(check_expression(ast->children[0]), DT_ADDRESS) || compare_types(check_expression(ast->children[1]), DT_ADDRESS) )
+                error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Can't compare adresses.");
         case AST_lit_true:
         case AST_lit_false:
             expr_type = DT_BOOL;
             break;
         case AST_add:
+            if( check_expression(ast->children[0]) == DT_ADDRESS ) {
+                if ( !compare_types(check_expression(ast->children[1]), DT_WORD)){
+                    error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Invalid operators for pointer arithmetic expression.");
+                    expr_type = DT_INVALID;
+                } else {
+                    expr_type = DT_ADDRESS;
+                } 
+            } else if(check_expression(ast->children[1]) == DT_ADDRESS){
+                if ( !compare_types(check_expression(ast->children[0]), DT_WORD)){ 
+                    error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Invalid operators for pointer arithmetic expression.");
+                    expr_type = DT_INVALID;
+                } else {
+                    expr_type = DT_ADDRESS;
+                } 
+            } else if( !(compare_types(check_expression(ast->children[0]), DT_WORD) && compare_types(check_expression(ast->children[1]), DT_WORD)) ){
+                error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Invalid operators for arithmetic expression.");
+                    expr_type = DT_INVALID;
+            } else{
+                expr_type = DT_WORD;
+            }
+            break;
         case AST_sub:
         case AST_mult:
         case AST_div:
@@ -228,19 +250,30 @@ DataType check_expression(ASTNode *ast) {
         case AST_lit_int:
             expr_type = DT_WORD;
             break;
-        case AST_identifier:
+        case AST_address:
+            expr_type = DT_ADDRESS;
+            break;
+        case AST_pointer:
             expr_type = check_var_type(ast);
             break;
+        case AST_identifier:
+            if(ast->hashValue->nature == DN_POINTER){
+                expr_type = DT_ADDRESS;
+            }
+            else{
+                expr_type = check_var_type(ast);
+            }
+            break;
         case AST_vet_ident:
-            expr_type = check_var_type(ast);
-            if(!compare_types(check_expression(ast->children[0]), DT_WORD))
+            expr_type = check_expression(ast->children[0]);
+            if(!compare_types(expr_type, DT_WORD))
                 error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Invalid expression for array index.");
+            expr_type = check_var_type(ast);
             break;
         case AST_par_block:
             expr_type = check_expression(ast->children[1]->children[0]);
             break;
         case AST_call_ident:
-            //TODO: function call
             expr_type = check_function_call(ast);
             break;
         default:
@@ -400,7 +433,11 @@ void check_loop_block(ASTNode *ast){
 void check_attr_ident(ASTNode *ast){
     DataType expr_type, var_type;
 
-    var_type = check_var_type(ast);
+    if(ast->hashValue->nature == DN_POINTER){
+        var_type = DT_ADDRESS;
+    } else{
+        var_type = check_var_type(ast);
+    }
 
     expr_type = check_expression(ast->children[0]);
     
