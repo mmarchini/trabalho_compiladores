@@ -2,4 +2,6 @@
 analisador
 etapa*
 y.tab.*
+*.swp
+*.swo
 lex.*

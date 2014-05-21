@@ -35,6 +35,23 @@ SemanticError *error_queue;
 // Semantic Errors
 //////////////////
 
+DataType check_var_type(ASTNode *ast){
+
+    if(ast->hashValue==NULL){
+        ast->hashValue->type = DT_INVALID;
+        error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Can't find declared variable in the declaration's table.");
+    }
+    if(ast->hashValue->type==DT_NULL){
+        ast->hashValue->type = DT_INVALID;
+        error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Undeclared variable.");
+    }
+
+
+    return ast->hashValue->type;
+}
+
+
+
 DataType set_literal_type(ASTNode *ast){
     switch(ast->type){
         case AST_lit_true:
@@ -79,26 +96,6 @@ DataType set_var_type(ASTNode *ast){
     return ast->hashValue->type;
 }
 
-DataType check_var_redeclaration(ASTNode *ast){
-
-    if(ast->hashValue==NULL){
-        ast->hashValue->type = DT_INVALID;
-        error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Can't find declared variable in the declaration's table.");
-        return ast->hashValue->type;
-    }
-    if(ast->children[0] == NULL){
-        ast->hashValue->type = DT_INVALID;
-        error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Can't determine declared variable's type.");
-        return ast->hashValue->type;
-    }
-    if(ast->hashValue->type!= DT_NULL){
-        error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Redefinition of declared variable.");
-        return ast->hashValue->type;
-    }
-
-    return set_var_type(ast);
-}
-
 bool compare_types(DataType type1, DataType type2){
     switch (type1) {
         case DT_WORD:
@@ -119,80 +116,6 @@ bool compare_types(DataType type1, DataType type2){
     }
     return true;
 }
-
-int check_var_declaration(ASTNode *ast){
-    DataType var_type, lit_type;
-
-    var_type = check_var_redeclaration(ast);
-    lit_type = set_literal_type(ast->children[1]);
-
-    if(!compare_types(var_type, lit_type)){
-        error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Literal's type didn't match variable's type.");
-    }
-
-    return 0;
-}
-
-int check_array_declaration(ASTNode *ast){
-    DataType var_type, lit_type;
-    bool is_equal = true;
-    ASTNode *aux;
-
-    var_type = check_var_redeclaration(ast);
-
-    if(ast->children[1] == NULL)
-        exit(10);
-    if(ast->children[1]->hashValue == NULL)
-        exit(11);
-    ast->children[1]->hashValue->type = DT_WORD;
-
-    // Null array, can return now
-    if(ast->children[2] == NULL)
-        return 0;
-
-    for(aux=ast->children[2];aux!=NULL;aux=aux->children[1]){
-        lit_type = set_literal_type(aux->children[0]);
-        is_equal = is_equal && compare_types(var_type, lit_type);
-    }
-
-    if(!is_equal){
-        error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Literal's type didn't match variable's type.");
-    }
-
-    return 0;
-}
-
-void check_def_func(ASTNode *ast){
-    DataType var_type;
-    ASTNode *aux = NULL;
-
-    check_var_redeclaration(ast);
-
-    if(ast->children[1] == NULL)
-        return;
-
-    for(aux=ast->children[1];aux!=NULL;aux=aux->children[1]){
-        check_var_redeclaration(aux);
-    }
-
-    //TODO: Return check
-}
-
-DataType check_var_type(ASTNode *ast){
-
-    if(ast->hashValue==NULL){
-        ast->hashValue->type = DT_INVALID;
-        error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Can't find declared variable in the declaration's table.");
-    }
-    if(ast->hashValue->type==DT_NULL){
-        ast->hashValue->type = DT_INVALID;
-        error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Undeclared variable.");
-    }
-
-
-    return ast->hashValue->type;
-}
-
 
 DataType check_expression(ASTNode *ast) {
     DataType expr_type;
@@ -254,6 +177,127 @@ DataType check_expression(ASTNode *ast) {
     return expr_type;
 }
 
+
+
+DataType check_var_redeclaration(ASTNode *ast){
+
+    if(ast->hashValue==NULL){
+        ast->hashValue->type = DT_INVALID;
+        error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Can't find declared variable in the declaration's table.");
+        return ast->hashValue->type;
+    }
+    if(ast->children[0] == NULL){
+        ast->hashValue->type = DT_INVALID;
+        error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Can't determine declared variable's type.");
+        return ast->hashValue->type;
+    }
+    if(ast->hashValue->type!= DT_NULL){
+        error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Redefinition of declared variable.");
+        return ast->hashValue->type;
+    }
+
+    return set_var_type(ast);
+}
+
+int check_var_declaration(ASTNode *ast){
+    DataType var_type, lit_type;
+
+    var_type = check_var_redeclaration(ast);
+    lit_type = set_literal_type(ast->children[1]);
+
+    if(!compare_types(var_type, lit_type)){
+        error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Literal's type didn't match variable's type.");
+    }
+
+    return 0;
+}
+
+int check_array_declaration(ASTNode *ast){
+    DataType var_type, lit_type;
+    bool is_equal = true;
+    ASTNode *aux;
+
+    var_type = check_var_redeclaration(ast);
+
+    if(ast->children[1] == NULL)
+        exit(10);
+    if(ast->children[1]->hashValue == NULL)
+        exit(11);
+    ast->children[1]->hashValue->type = DT_WORD;
+
+    // Null array, can return now
+    if(ast->children[2] == NULL)
+        return 0;
+
+    for(aux=ast->children[2];aux!=NULL;aux=aux->children[1]){
+        lit_type = set_literal_type(aux->children[0]);
+        is_equal = is_equal && compare_types(var_type, lit_type);
+    }
+
+    if(!is_equal){
+        error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Literal's type didn't match variable's type.");
+    }
+
+    return 0;
+}
+
+DataType check_head_func(ASTNode *ast){
+    DataType return_type;
+    ASTNode *aux = NULL;
+
+    return_type = check_var_redeclaration(ast);
+
+    // Check parameters
+    if(ast->children[1] != NULL)
+        for(aux=ast->children[1];aux!=NULL;aux=aux->children[1]){
+            check_var_redeclaration(aux);
+        }
+    return return_type; 
+}
+
+void check_return(ASTNode *ast, DataType return_type){
+    while(ast!=NULL){
+        switch(ast->type){
+            case AST_command:
+                ast = ast->children[0];
+                break;
+            case AST_com_block:
+                ast = ast->children[0];
+                break;
+            case AST_com_seq:
+                check_return(ast->children[0], return_type);
+                ast = ast->children[1];
+                break;
+            case AST_if_block:
+                if(ast->children[2])
+                    check_return(ast->children[2], return_type);
+            case AST_loop_block:
+                check_return(ast->children[1], return_type);
+                ast = NULL;
+                break;
+            case AST_return:
+                if(!compare_types(check_expression(ast->children[0]), return_type))
+                    error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Return type didn't match function type.");
+                ast=NULL;
+                break;
+            default:
+                ast=NULL;
+                break;
+
+        }
+    }
+
+}
+
+void check_def_func(ASTNode *ast){
+    DataType return_type;
+    ASTNode *aux;
+
+    return_type = check_head_func(ast->children[0]);
+
+    check_return(ast->children[1], return_type);
+}
+
 void check_if_block(ASTNode *ast){
     DataType expr_type;
 
@@ -308,7 +352,6 @@ void check_input(ASTNode *ast){
     if(compare_types(check_var_type(ast), DT_BOOL)){
         error_queue=SemanticErrorInsert(error_queue, getLineNumber(), "Can't use bool variables in input.");
     }
-
 }
 
 int check_output(ASTNode *ast){
@@ -338,14 +381,13 @@ int check_semantic(ASTNode *ast){
         case AST_array_var:
             check_array_declaration(ast);
             break;
-        case AST_head_func:
+        case AST_def_func:
             check_def_func(ast);
             break;
         case AST_if_block:
             check_if_block(ast);
             break;
         case AST_loop_block:
-            //TODO: Tests
             check_loop_block(ast);
             break;
         case AST_input:
@@ -353,14 +395,11 @@ int check_semantic(ASTNode *ast){
             break;
         case AST_output:
             check_output(ast);
-            //TODO
             break;
         case AST_attr_ident:
-            //TODO: Tests
             check_attr_ident(ast);
             break;
         case AST_attr_array:
-            //TODO: Tests
             check_attr_array(ast);
             break;
         default:

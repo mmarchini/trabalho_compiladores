@@ -1,0 +1,15 @@
+// UFRGS - Compiladores - Marcelo Johann - 2014/1
+
+byte byte_vec[3]:5 10 15; 
+bool bool_vec[5]:true false false false true; 
+word word_lit : 5;
+word cha_lit:'a';
+
+word main()
+  {
+    if (bool_vec[3]) then{
+        return word_lit
+    }
+    return word_lit == word_lit 
+  };
+

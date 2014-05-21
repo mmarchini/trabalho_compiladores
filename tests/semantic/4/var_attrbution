@@ -1,0 +1,12 @@
+// UFRGS - Compiladores - Marcelo Johann - 2014/1
+
+word a:5;
+word b[2]:5 6;
+bool c: false;
+
+word main()
+  {
+  a = c || ( a != b[1] )
+  c = a > b[6]
+  };
+

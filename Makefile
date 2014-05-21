@@ -30,7 +30,7 @@ semantic.o: semantic.c semantic.h
 
 hash.o: hash.c hash.h
 	@echo "compilando a tabela hash"
-	@gcc ${extra_params} -c hash.c -o hash.o
+	@gcc ${EXTRA_PARAMS} -c hash.c -o hash.o
 
 ast.o: ast.c ast.h
 	@echo "Compilando a tabela ast"
