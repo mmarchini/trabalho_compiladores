@@ -5,10 +5,10 @@
 #include "hash.h"
 #include "util.h"
 
-extern HashTable *hashTable;
 extern ASTNode *ast;
 extern int running;
 extern FILE *yyin;
+extern SemanticError *error_queue;
 
 FILE *outputFile;
 
@@ -32,11 +32,17 @@ int main(int argn, char *args[]){
 
     yyparse();
 
-    if(outputFile) 
+    /* if(outputFile) 
         fprintf(outputFile, "%s", astPrintFile(ast)); 
     else 
         astPrint(ast, 0); 
+    */
 
-    return check_semantic(ast, hashTable);
+    if(error_queue != NULL){
+        SemanticErrorPrint(error_queue);
+        return SEMANTIC_ERROR_EXIT;
+    } 
+
+    return 0;
 }
 

@@ -2,7 +2,8 @@
 #define _HASH
 
 typedef enum {
-    DT_UNDEFINED = 0, 
+    DT_INVALID= -1, 
+    DT_NULL = 0, 
     DT_BYTE = 1, 
     DT_WORD = 2, 
     DT_CHAR = 3, 

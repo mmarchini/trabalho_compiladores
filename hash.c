@@ -58,6 +58,8 @@ HashTable *hashInsert(HashTable *hash, char *value, int code){
     curHash->value = calloc(1, strlen(value)+1);
     strcpy(curHash->value, value);
     curHash->code  = code;
+    curHash->type  = DT_NULL;
+
 
     return curHash;
 }

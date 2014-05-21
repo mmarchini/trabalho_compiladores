@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "ast.h"
+#include "semantic.h"
 
 ASTNode *astCreate(int type, HashTable *hash, 
                    ASTNode *ast0, ASTNode *ast1, 
@@ -14,6 +15,8 @@ ASTNode *astCreate(int type, HashTable *hash,
     ast->children[1] = ast1;
     ast->children[2] = ast2;
     ast->children[3] = ast3;
+
+    check_semantic(ast);
 
     return ast;
 }

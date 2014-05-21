@@ -29,5 +29,5 @@ void initMe(){
     hashTable = hashInit();
 }
 
-int getLineNumber(){ return nline; }
+int getLineNumber(){ return nline+1; }
 
