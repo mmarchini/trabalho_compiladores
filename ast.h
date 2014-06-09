@@ -81,6 +81,7 @@
 typedef struct _astNode{
     int type;
     HashTable *hashValue;
+    int currentLine;
     struct _astNode *children[CHILDREN];
 
 } ASTNode;

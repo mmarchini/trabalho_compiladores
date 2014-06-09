@@ -32,6 +32,8 @@ int main(int argn, char *args[]){
     initMe();
 
     yyparse();
+    
+    check_semantic(ast);
 
     if(outputFile)
         fprintf(outputFile, "%s", astPrintFile(ast)); 

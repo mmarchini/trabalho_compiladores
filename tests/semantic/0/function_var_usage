@@ -1,0 +1,8 @@
+// UFRGS - Compiladores - Marcelo Johann - 2014/1
+
+word main(word a, word b)
+  {
+  a = 5
+  b = a * 2
+  };
+
