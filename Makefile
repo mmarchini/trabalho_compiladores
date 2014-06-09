@@ -1,46 +1,43 @@
-ETAPA=etapa4
+ETAPA=etapa5
 
-EXTRA_PARAMS=--std=c99
+CC=gcc
+CCFLAGS=--std=c99 -L .
 
-all: util.o ast.o hash.o y.tab.o lex.yy.o scanner.o semantic.o
-	@echo "Montando o scanner"
-	@gcc ${EXTRA_PARAMS} semantic.o util.o ast.o main.o lex.yy.o y.tab.o hash.o -L . -o ${ETAPA} 
+DEPS=util ast hash main semantic
+DEP_OBJS:=${foreach file, $(DEPS),$(file).o}
 
-util.o: util.c util.h
-	@echo "Compilando a tabela Hash"
-	@gcc ${EXTRA_PARAMS} -c util.c -o util.o
+LEX=lex
+LEX_FILE=scanner.l 
+LEX_OBJ=lex.yy.o
 
-scanner.o: main.c
-	@echo "Compilar o main.c"
-	@gcc ${EXTRA_PARAMS} -c main.c -o main.o
+YACC=bison
+YACCFLAGS=-d --file-prefix y
+YACC_FILE=syntax.y 
+YACC_OBJ=y.tab.o
 
-y.tab.o: syntax.y
-	@echo "Compilar o syntax.y"
-	@bison syntax.y -d --file-prefix y
-	@gcc ${EXTRA_PARAMS} -c y.tab.c -o y.tab.o
+all: $(YACC_OBJ) $(LEX_OBJ) $(DEP_OBJS)  
+	@echo "Compilando o Compilador"
+	@$(CC) $(YACC_OBJ) $(LEX_OBJ) $(DEP_OBJS) -o $(ETAPA) $(CCFLAGS)
 
-lex.yy.o: scanner.l
-	@echo "Compilar o scanner.l"
-	@lex scanner.l
-	@gcc ${EXTRA_PARAMS} -c lex.yy.c -o lex.yy.o
+%.o: %.c $(DEPS)
+	@$(CC) -c -o $@ $(CCFLAGS)
 
-semantic.o: semantic.c semantic.h
-	@echo "compilando o analisador semântico"
-	@gcc ${EXTRA_PARAMS} -c semantic.c -o semantic.o
 
-hash.o: hash.c hash.h
-	@echo "compilando a tabela hash"
-	@gcc ${EXTRA_PARAMS} -c hash.c -o hash.o
+$(YACC_OBJ): $(YACC_FILE)
+	@echo "Compilando o $(YACC_FILE)"
+	@$(YACC) syntax.y $(YACCFLAGS)
+	@$(CC) -c y.tab.c -o y.tab.o $(CCFLAGS)
 
-ast.o: ast.c ast.h
-	@echo "Compilando a tabela ast"
-	@gcc ${EXTRA_PARAMS} -c ast.c -o ast.o
+$(LEX_OBJ): $(LEX_FILE) 
+	@echo "Compilando o $(LEX_OBJ)"
+	@$(LEX) scanner.l
+	@$(CC) -c lex.yy.c -o lex.yy.o $(CCFLAGS)
 
 test:
 	@echo "Testing Syntax"
-	@./tests/syntax.sh ${ETAPA}
+	@./tests/syntax.sh $(ETAPA)
 	@echo "Testing Semantics"
-	@./tests/semantic.sh ${ETAPA}
+	@./tests/semantic.sh $(ETAPA)
 
 clean:
 	@rm -f lex.yy.* *.o etapa3 y.tab.* 
