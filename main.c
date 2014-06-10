@@ -10,6 +10,7 @@ extern ASTNode *ast;
 extern int running;
 extern FILE *yyin;
 extern SemanticError *error_queue;
+extern HashTable *hashTable;
 
 FILE *outputFile;
 
@@ -19,6 +20,7 @@ char tkstr[35][100] = {};
 
 int main(int argn, char *args[]){
     int lexReturn;
+    TACQueue *queue;
 
     if(argn > 1)
         yyin = fopen(args[1], "r");
@@ -35,16 +37,12 @@ int main(int argn, char *args[]){
     
     check_semantic(ast);
 
-    if(outputFile)
-        fprintf(outputFile, "%s", astPrintFile(ast)); 
-    else 
-        astPrint(ast, 0); 
-
-
     if(error_queue != NULL){
         SemanticErrorPrint(error_queue);
         return SEMANTIC_ERROR_EXIT;
     }
+
+    TACQueuePrint(TACProgram(ast, hashTable));
 
 
 

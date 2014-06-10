@@ -1,7 +1,7 @@
 ETAPA=etapa5
 
 CC=gcc
-CCFLAGS=--std=c99 -L . 
+CFLAGS=--std=c99 -L .
 
 DEPS=util ast hash main semantic tac queue
 DEP_OBJS:=${foreach file, $(DEPS),$(file).o}
@@ -20,8 +20,6 @@ all: $(YACC_OBJ) $(LEX_OBJ) $(DEP_OBJS)
 	@$(CC) $(YACC_OBJ) $(LEX_OBJ) $(DEP_OBJS) -o $(ETAPA) $(CCFLAGS)
 
 %.o: %.c $(DEPS)
-	@$(CC) -c -o $@ $(CCFLAGS)
-
 
 $(YACC_OBJ): $(YACC_FILE)
 	@echo "Compilando o $(YACC_FILE)"

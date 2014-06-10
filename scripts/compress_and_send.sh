@@ -12,10 +12,8 @@ fi
 mkdir tmp;
 
 # Copia os arquivos para a pasta tmp e entra na pasta tmp
-for file in "ast.c ast.h hash.c hash.h main.c Makefile scanner.l syntax.y symbols.h util.c util.h semantic.c semantic.h"
+for file in "ast.c ast.h hash.c hash.h main.c Makefile scanner.l syntax.y symbols.h util.c util.h semantic.c semantic.h tac.c tac.h queue.c queue.h"
 do
-    cp $file tmp/;
-    cp $file tmp/;
     cp $file tmp/;
 done;
 cd tmp;

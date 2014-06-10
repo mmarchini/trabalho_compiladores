@@ -9,7 +9,7 @@
     int nline;
     char buf[1024];
     char *s;
-    HashTable *hashTable;
+    extern HashTable *hashTable;
 
 %}
 
