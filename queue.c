@@ -52,6 +52,10 @@ char *codeString(int code){
 	case TAC_MUL: return "MUL";
 	case TAC_DIV: return "DIV";
 
+	case TAC_ADDRESS: return "ADDRESS";
+	case TAC_POINTER: return "POINTER";
+	case TAC_NOT: return "NOT";
+
 	case TAC_LABEL: return "LABEL";
 	case TAC_BEGINFUN: return "BEGINFUN";
 	case TAC_ENDFUN: return "ENDFUN";
@@ -65,6 +69,8 @@ char *codeString(int code){
 	case TAC_RET: return "RET";
 	case TAC_PRINT: return "PRINT";
 	case TAC_READ: return "READ";
+
+	default: return "**NOSTRING**";
 	}
 }
 
@@ -281,9 +287,10 @@ HashTable *TACExpression(ASTNode *ast, HashTable *hash, TACQueue **queue){
 			// TODO
 			break;
 		case AST_par_block:
-			val = TACExpression(ast->children[1], hash, queue);
+			val = TACExpression(ast->children[1]->children[0], hash, queue);
 			break;
 		default:
+			printf("Expression evaluation error. ast->type: %d\n", ast->type);
 			exit(11);
 			break;
 	}
@@ -417,7 +424,7 @@ TACQueue *TACCommand(ASTNode *ast, HashTable *hash){
 			//TODO
 			break;
 		default:
-			exit(11);
+			exit(12);
 			break;
 	}
 
