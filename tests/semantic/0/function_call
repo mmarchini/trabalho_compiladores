@@ -11,6 +11,6 @@ word teste( word tes ){
 
 word main()
   {
-    byte_vec[1] = teste ( 5 )
+    word_lit = teste ( 5 )
   };
 

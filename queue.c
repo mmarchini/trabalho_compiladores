@@ -519,7 +519,7 @@ TACQueue *TACFuncDeclaration(ASTNode *ast, HashTable *hash){
 		NULL,
 		TACCreate(
 			TAC_BEGINFUN,
-			NULL,
+			ast->children[0]->hashValue,
 			NULL,
 			NULL
 		)
