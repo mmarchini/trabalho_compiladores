@@ -128,7 +128,7 @@ TACQueue *TACAssign(TACQueue *queue, HashTable *var, HashTable *value){
 	);
 }
 
-TACQueue *TACArrayAssign(TACQueue *queue, HashTable *hash, HashTable *var,
+TACQueue *TACArrayAssignInt(TACQueue *queue, HashTable *hash, HashTable *var,
 		int index, HashTable *value)
 {
 	char auxStr[1024];
@@ -138,14 +138,16 @@ TACQueue *TACArrayAssign(TACQueue *queue, HashTable *hash, HashTable *var,
 		hashInsert(hash, auxStr, var->code),
 		value
 	);
-	return TACQueueInsert(
+}
+
+TACQueue *TACArrayAssignExpr(TACQueue *queue, HashTable *hash, HashTable *var,
+		HashTable *index, HashTable *value)
+{
+
+	return TACAssign(
 		queue,
-		TACCreate(
-			TAC_MOVE,
-			var,
-			value,
-			NULL
-		)
+		HashInsertTmp(hash, "array_attribution"),
+		value
 	);
 }
 
@@ -169,7 +171,7 @@ TACQueue *TACVarDeclaration(ASTNode *ast, HashTable *hash){
 			length = atoi(ast->children[1]->hashValue->value);
 			index=0;
 			for(auxAST=ast->children[2];auxAST!=NULL;auxAST=auxAST->children[1]){
-				queue = TACArrayAssign(
+				queue = TACArrayAssignInt(
 					queue, hash,
 					ast->hashValue, index,
 					auxAST->children[0]->hashValue
@@ -177,7 +179,7 @@ TACQueue *TACVarDeclaration(ASTNode *ast, HashTable *hash){
 				index++;
 			}
 			for(;index<length;index++){
-				queue = TACArrayAssign(
+				queue = TACArrayAssignInt(
 					queue,
 					hash,
 					ast->hashValue,
@@ -213,6 +215,41 @@ TACQueue *TACOperate(HashTable *hash, TACType operator, HashTable *result,
 	);
 
 	return queue;
+}
+
+HashTable *TACCall(ASTNode *ast, HashTable *hash, TACQueue **queue){
+	HashTable *return_value = HashInsertTmp(hash, "return_value");
+	ASTNode *args;
+	char params[16];
+	int arg_count=0;
+
+	if(ast->children[0]!=NULL)
+		for(args=ast->children[0]->children[0];args!=NULL;args=args->children[1]){
+			arg_count++;
+			*queue = TACQueueInsert(
+				*queue,
+				TACCreate(
+					TAC_ARG,
+					TACExpression(args->children[0], hash, queue),
+					NULL,
+					NULL
+				)
+			);
+		}
+
+	sprintf(params, "%d", arg_count);
+
+	TACQueueInsert(
+		*queue,
+		TACCreate(
+			TAC_CALL,
+			return_value,
+			ast->hashValue,
+			hashInsert(hash, params, LIT_INTEGER)
+		)
+	);
+
+	return return_value;
 }
 
 HashTable *TACExpression(ASTNode *ast, HashTable *hash, TACQueue **queue){
@@ -281,7 +318,7 @@ HashTable *TACExpression(ASTNode *ast, HashTable *hash, TACQueue **queue){
 			val = ast->hashValue;
 			break;
 		case AST_call_ident:
-			// TODO
+			val = TACCall(ast, hash, queue);
 			break;
 		case AST_vet_ident:
 			// TODO
@@ -359,6 +396,31 @@ TACQueue *TACIf(ASTNode *ast, HashTable *hash){
 	return queue;
 }
 
+TACQueue *TACLoop(ASTNode *ast, HashTable *hash){
+	TACQueue *queue=NULL;
+	HashTable *loop_start=HashInsertTmp(hash, "loop_start");
+	HashTable *loop_end=HashInsertTmp(hash, "loop_end");
+
+	queue = TACQueueJoin(queue, TACLabel(loop_start));
+
+	// Test condition
+	queue = TACQueueInsert(
+		queue,
+		TACCreate(
+			TAC_IFZ,
+			loop_end,
+			TACExpression(ast->children[0], hash, &queue),
+			NULL
+		)
+	);
+
+	queue = TACQueueJoin(queue, TACJump(loop_start));
+	queue = TACQueueJoin(queue, TACLabel(loop_end));
+
+	return queue;
+}
+
+
 TACQueue *TACCommand(ASTNode *ast, HashTable *hash){
 	TACQueue *queue=NULL;
 
@@ -384,7 +446,8 @@ TACQueue *TACCommand(ASTNode *ast, HashTable *hash){
 			);
 			break;
 		case AST_attr_array:
-			/*queue = TACArrayAssign(
+			//TODO
+			/*queue = TACArrayAssignExpr(
 				queue,hash,
 				ast->hashValue,TACExpression(ast->children[0], hash, &queue),
 				TACExpression(ast->children[1], hash, &queue)
@@ -418,10 +481,18 @@ TACQueue *TACCommand(ASTNode *ast, HashTable *hash){
 			queue = TACIf(ast, hash);
 			break;
 		case AST_return:
-			//TODO
+			queue = TACQueueInsert(
+				queue,
+				TACCreate(
+					TAC_RET,
+					TACExpression(ast->children[0],hash,&queue),
+					NULL,
+					NULL
+				)
+			);
 			break;
 		case AST_loop_block:
-			//TODO
+			queue = TACLoop(ast, hash);
 			break;
 		default:
 			exit(12);
@@ -499,7 +570,7 @@ TACQueue *TACProgram(ASTNode *ast, HashTable *hash){
 			);
 			break;
 		default:
-			//exit(TAC_INVALID_ERROR);
+			exit(TAC_INVALID_ERROR);
 			break;
 	}
 
