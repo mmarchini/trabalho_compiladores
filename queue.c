@@ -1,5 +1,7 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
+#include "util.h"
 #include "ast.h"
 #include "queue.h"
 #include "y.tab.h"
@@ -37,8 +39,18 @@ char *codeString(int code){
 	case TAC_SYMBOL: return "SYMBOL";
 	case TAC_MOVE: return "MOVE";
 
+	case TAC_GREAT: return "GREAT";
+	case TAC_LESS: return "LESS";
+	case TAC_LE: return "LE";
+	case TAC_GE: return "GE";
+	case TAC_EQ: return "EQ";
+	case TAC_NE: return "NE";
+	case TAC_AND: return "AND";
+	case TAC_OR: return "OR";
 	case TAC_ADD: return "ADD";
+	case TAC_SUB: return "SUB";
 	case TAC_MUL: return "MUL";
+	case TAC_DIV: return "DIV";
 
 	case TAC_LABEL: return "LABEL";
 	case TAC_BEGINFUN: return "BEGINFUN";
@@ -70,13 +82,24 @@ TACQueue *TACQueuePrint(TACQueue *queue){
 		);
 	}
 
-
+	return queue;
 }
 
 /* Util */
 
 HashTable *HashInsertTmp(HashTable *hash, char *tmp_name){
-	//TODO implement
+	bool not_found=true;
+	char aux_name[strlen(tmp_name)+16];
+	int index=0;
+
+	while(not_found){
+		sprintf(aux_name, "$_%s_%d", tmp_name, index);
+		if( hashSearch(hash, aux_name, TK_IDENTIFIER) == NULL)
+			not_found=false;
+		else
+			index++;
+	}
+	return hashInsert(hash, aux_name, TK_IDENTIFIER);
 }
 
 
@@ -100,7 +123,8 @@ TACQueue *TACAssign(TACQueue *queue, HashTable *var, HashTable *value){
 }
 
 TACQueue *TACArrayAssign(TACQueue *queue, HashTable *hash, HashTable *var,
-		int index, HashTable *value) {
+		int index, HashTable *value)
+{
 	char auxStr[1024];
 	sprintf(auxStr, "$_%s[%d]", var->value, index);
 	return TACAssign(
@@ -129,17 +153,22 @@ TACQueue *TACVarDeclaration(ASTNode *ast, HashTable *hash){
 	switch(ast->type){
 		case AST_var:
 		case AST_pt_var:
-			queue = TACAssign(queue, ast->hashValue, ast->children[0]->hashValue);
+			queue = TACAssign(
+				queue,
+				ast->hashValue,
+				ast->children[1]->hashValue
+			);
 			break;
 		case AST_array_var:
 			length = atoi(ast->children[1]->hashValue->value);
 			index=0;
 			for(auxAST=ast->children[2];auxAST!=NULL;auxAST=auxAST->children[1]){
 				queue = TACArrayAssign(
-					queue,hash,
-					ast->hashValue,index,
-					ast->children[1]->hashValue
+					queue, hash,
+					ast->hashValue, index,
+					auxAST->children[0]->hashValue
 				);
+				index++;
 			}
 			for(;index<length;index++){
 				queue = TACArrayAssign(
@@ -159,8 +188,178 @@ TACQueue *TACVarDeclaration(ASTNode *ast, HashTable *hash){
 	return queue;
 }
 
+HashTable *TACExpression(ASTNode *ast, HashTable *hash, TACQueue **queue);
+
+TACQueue *TACOperate(HashTable *hash, TACType operator, HashTable *result,
+		ASTNode *op_left, ASTNode *op_right)
+{
+	TACQueue *queue=NULL;
+	HashTable *hash_left;
+	HashTable *hash_right;
+
+	hash_left  = TACExpression(op_left, hash, &queue);
+	hash_right = TACExpression(op_right, hash, &queue);
+
+	queue = TACQueueInsert(
+		queue,
+		TACCreate(operator, result, hash_left, hash_right)
+	);
+
+	return queue;
+}
+
+HashTable *TACExpression(ASTNode *ast, HashTable *hash, TACQueue **queue){
+	HashTable *val=NULL;
+	TACType operator = TAC_SYMBOL;
+
+	if(ast==NULL)
+		return NULL;
+
+	switch(ast->type){
+		case AST_great:
+			operator = operator == TAC_SYMBOL ? TAC_GREAT : operator;
+			/* no break */
+		case AST_less:
+			operator = operator == TAC_SYMBOL ? TAC_LESS  : operator;
+			/* no break */
+		case AST_le:
+			operator = operator == TAC_SYMBOL ? TAC_LE    : operator;
+			/* no break */
+		case AST_ge:
+			operator = operator == TAC_SYMBOL ? TAC_GE    : operator;
+			/* no break */
+		case AST_eq:
+			operator = operator == TAC_SYMBOL ? TAC_EQ    : operator;
+			/* no break */
+		case AST_ne:
+			operator = operator == TAC_SYMBOL ? TAC_NE    : operator;
+			/* no break */
+		case AST_and:
+			operator = operator == TAC_SYMBOL ? TAC_AND   : operator;
+			/* no break */
+		case AST_or:
+			operator = operator == TAC_SYMBOL ? TAC_OR    : operator;
+			/* no break */
+		case AST_add:
+			operator = operator == TAC_SYMBOL ? TAC_ADD   : operator;
+			/* no break */
+		case AST_sub:
+			operator = operator == TAC_SYMBOL ? TAC_SUB   : operator;
+			/* no break */
+		case AST_mult:
+			operator = operator == TAC_SYMBOL ? TAC_MUL   : operator;
+			/* no break */
+		case AST_div:
+			operator = operator == TAC_SYMBOL ? TAC_DIV   : operator;
+			/* no break */
+		case AST_address:
+			operator = operator == TAC_SYMBOL ? TAC_ADDRESS : operator;
+			/* no break */
+		case AST_pointer:
+			operator = operator == TAC_SYMBOL ? TAC_POINTER   : operator;
+			/* no break */
+		case AST_not:
+			operator = operator == TAC_SYMBOL ? TAC_NOT : operator;
+			val=HashInsertTmp(hash, "expression");
+			*queue = TACQueueJoin(
+				*queue,
+				TACOperate(hash, operator, val, ast->children[0],ast->children[1])
+			);
+			break;
+		case AST_identifier:
+		case AST_lit_char:
+		case AST_lit_int:
+		case AST_lit_true:
+		case AST_lit_false:
+			val = ast->hashValue;
+			break;
+		case AST_call_ident:
+			// TODO
+			break;
+		case AST_vet_ident:
+			// TODO
+			break;
+		case AST_par_block:
+			val = TACExpression(ast->children[1], hash, queue);
+			break;
+		default:
+			exit(11);
+			break;
+	}
+
+	return val;
+}
+
 TACQueue *TACCommand(ASTNode *ast, HashTable *hash){
-	return NULL;
+	TACQueue *queue=NULL;
+
+	if(ast==NULL)
+		return queue;
+
+	ast = ast->children[0];
+
+	switch(ast->type){
+		case AST_com_block:
+			for(ast=ast->children[0];ast!=NULL;ast=ast->children[1]){
+				queue=TACQueueJoin(
+					queue,
+					TACCommand(ast->children[0], hash)
+				);
+			}
+			break;
+		case AST_attr_ident:
+			queue = TACAssign(
+				queue,
+				ast->hashValue,
+				TACExpression(ast->children[0], hash, &queue)
+			);
+			break;
+		case AST_attr_array:
+			/*queue = TACArrayAssign(
+				queue,hash,
+				ast->hashValue,TACExpression(ast->children[0], hash, &queue),
+				TACExpression(ast->children[1], hash, &queue)
+			);*/
+			break;
+		case AST_input:
+			queue = TACQueueInsert(
+				queue,
+				TACCreate(
+					TAC_READ,
+					ast->hashValue,
+					NULL,
+					NULL
+				)
+			);
+			break;
+		case AST_output:
+			for(ast=ast->children[0];ast!=NULL;ast=ast->children[1]){
+				queue = TACQueueInsert(
+					queue,
+					TACCreate(
+						TAC_PRINT,
+						ast->hashValue != NULL ? ast->hashValue : TACExpression(ast->children[0],hash,&queue),
+						NULL,
+						NULL
+					)
+				);
+			}
+			break;
+		case AST_return:
+			//TODO
+			break;
+		case AST_if_block:
+			//TODO
+			break;
+		case AST_loop_block:
+			//TODO
+			break;
+		default:
+			exit(11);
+			break;
+	}
+
+	return queue;
 }
 
 TACQueue *TACArgsDeclaration(ASTNode *ast, HashTable *hash){
@@ -177,7 +376,7 @@ TACQueue *TACArgsDeclaration(ASTNode *ast, HashTable *hash){
 
 TACQueue *TACFuncDeclaration(ASTNode *ast, HashTable *hash){
 	TACQueue *queue = TACQueueInsert(
-		queue,
+		NULL,
 		TACCreate(
 			TAC_BEGINFUN,
 			NULL,
@@ -187,9 +386,9 @@ TACQueue *TACFuncDeclaration(ASTNode *ast, HashTable *hash){
 	);
 
 	queue = TACQueueJoin(
-		queue,
+		TACArgsDeclaration(ast->children[0], hash),
 		TACQueueJoin(
-			TACArgsDeclaration(ast->children[0], hash),
+			queue,
 			TACCommand(ast->children[1], hash)
 		)
 	);

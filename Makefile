@@ -1,7 +1,7 @@
 ETAPA=etapa5
 
 CC=gcc
-CFLAGS=--std=c99 -L .
+CFLAGS=--std=c99 -L . -g
 
 DEPS=util ast hash main semantic tac queue
 DEP_OBJS:=${foreach file, $(DEPS),$(file).o}

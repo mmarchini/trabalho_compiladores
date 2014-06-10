@@ -483,7 +483,6 @@ void check_attr_array(ASTNode *ast){
 }
 
 void check_input(ASTNode *ast){
-    printf("%d\n", ast->type);
     if(compare_types(check_var_type(ast), DT_BOOL)){
         error_queue=SemanticErrorInsert(error_queue, ast->currentLine, "Can't use bool variables in input.");
     }
