@@ -189,6 +189,7 @@ TACQueue *TACVarDeclaration(ASTNode *ast, HashTable *hash){
 }
 
 HashTable *TACExpression(ASTNode *ast, HashTable *hash, TACQueue **queue);
+TACQueue *TACCommand(ASTNode *ast, HashTable *hash);
 
 TACQueue *TACOperate(HashTable *hash, TACType operator, HashTable *result,
 		ASTNode *op_left, ASTNode *op_right)
@@ -290,6 +291,67 @@ HashTable *TACExpression(ASTNode *ast, HashTable *hash, TACQueue **queue){
 	return val;
 }
 
+TACQueue *TACLabel(HashTable *label){
+	return TACQueueInsert(
+		NULL,
+		TACCreate(
+			TAC_LABEL,
+			label,
+			NULL,
+			NULL
+		)
+	);
+}
+
+TACQueue *TACJump(HashTable *label){
+	return TACQueueInsert(
+		NULL,
+		TACCreate(
+			TAC_JUMP,
+			label,
+			NULL,
+			NULL
+		)
+	);
+}
+
+TACQueue *TACIf(ASTNode *ast, HashTable *hash){
+	TACQueue *queue=NULL;
+	HashTable *else_=HashInsertTmp(hash, "else");
+	HashTable *finally_=HashInsertTmp(hash, "finally");
+
+	// Test condition
+	queue = TACQueueInsert(
+		queue,
+		TACCreate(
+			TAC_IFZ,
+			else_,
+			TACExpression(ast->children[0], hash, &queue),
+			NULL
+		)
+	);
+
+	// Condition passed code
+
+	queue = TACQueueJoin(
+		queue,
+		TACCommand(ast->children[1],hash)
+	);
+
+	queue = TACQueueJoin(queue, TACJump(finally_));
+
+	// Else code
+	queue = TACQueueJoin(queue, TACLabel(else_));
+	queue = TACQueueJoin(
+		queue,
+		TACCommand(ast->children[2],hash)
+	);
+
+	queue = TACQueueJoin(queue, TACLabel(finally_));
+
+	return queue;
+}
+
 TACQueue *TACCommand(ASTNode *ast, HashTable *hash){
 	TACQueue *queue=NULL;
 
@@ -345,10 +407,10 @@ TACQueue *TACCommand(ASTNode *ast, HashTable *hash){
 				);
 			}
 			break;
-		case AST_return:
-			//TODO
-			break;
 		case AST_if_block:
+			queue = TACIf(ast, hash);
+			break;
+		case AST_return:
 			//TODO
 			break;
 		case AST_loop_block:
@@ -436,3 +498,4 @@ TACQueue *TACProgram(ASTNode *ast, HashTable *hash){
 
 	return queue;
 }
+
