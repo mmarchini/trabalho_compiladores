@@ -42,7 +42,7 @@ int main(int argn, char *args[]){
         return SEMANTIC_ERROR_EXIT;
     }
 
-    TACQueuePrint(TACProgram(ast, hashTable));
+    //TACQueuePrint(TACProgram(ast, hashTable));
 
 
 
