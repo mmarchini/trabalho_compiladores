@@ -7,6 +7,9 @@ bool c:true;
 word main()
   {
     loop {
+        if( a == b ) then {
+            a = a*b
+        }
     } ( a == b )
     loop {
     } ( a != b )
