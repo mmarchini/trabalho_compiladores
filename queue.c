@@ -133,15 +133,23 @@ TACQueue *TACAssign(TACQueue *queue, HashTable *var, HashTable *value){
 
 HashTable *TACGetArrayIntIndex(HashTable *hash, HashTable *var, int index){
 	char auxStr[1024];
+	HashTable *newHash;
 	sprintf(auxStr, "$_%s[%d]", var->value, index);
-	return hashInsert(hash, auxStr, var->code);
+	newHash = hashInsert(hash, auxStr, var->code);
+	newHash->type = var->type;
+	newHash->nature = var->nature;
+	return newHash;
 }
 
 HashTable *TACGetArrayExprIndex(HashTable *hash, HashTable *var, ASTNode *index, TACQueue **queue){
 	char auxStr[1024];
 	HashTable *expr = TACExpression(index, hash, queue);
+	HashTable *newHash;
 	sprintf(auxStr, "$_%s[%s]", var->value, expr->value);
-	return hashInsert(hash, auxStr, var->code);
+	newHash = hashInsert(hash, auxStr, var->code);
+	newHash->type = var->type;
+	newHash->nature = var->nature;
+	return newHash;
 }
 
 TACQueue *TACArrayAssignInt(TACQueue *queue, HashTable *hash, HashTable *var,
@@ -538,7 +546,7 @@ TACQueue *TACFuncDeclaration(ASTNode *ast, HashTable *hash){
 		queue,
 		TACCreate(
 			TAC_ENDFUN,
-			NULL,
+			ast->children[0]->hashValue,
 			NULL,
 			NULL
 		)

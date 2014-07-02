@@ -5,6 +5,7 @@
 #include "hash.h"
 #include "util.h"
 #include "queue.h"
+#include "translate.h"
 
 extern ASTNode *ast;
 extern int running;
@@ -43,7 +44,8 @@ int main(int argn, char *args[]){
     }
 
     queue = TACProgram(ast, hashTable);
-    TACQueuePrint(queue);
+    //TACQueuePrint(queue);
+    translate(queue, outputFile);
 
     return 0;
 }

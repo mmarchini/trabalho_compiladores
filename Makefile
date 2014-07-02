@@ -1,9 +1,9 @@
-ETAPA=etapa5
+ETAPA=etapa6
 
 CC=gcc
 CFLAGS=--std=c99 -L . -g
 
-DEPS=util ast hash main semantic tac queue
+DEPS=util ast hash main semantic tac queue translate
 DEP_OBJS:=${foreach file, $(DEPS),$(file).o}
 
 LEX=lex
