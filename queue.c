@@ -5,8 +5,11 @@
 #include "ast.h"
 #include "queue.h"
 #include "y.tab.h"
+#include "symbols.h"
 
 #define TAC_INVALID_ERROR 18
+
+#define WHICH_DT(op1, op2) op1->type == op2->type ? op1->type : DT_WORD
 
 TACQueue *TACQueueInsert(TACQueue *queue, TAC *tac){
 	TACQueue *newQueue = calloc(1, sizeof(TACQueue));
@@ -103,12 +106,12 @@ HashTable *HashInsertTmp(HashTable *hash, char *tmp_name){
 
 	while(not_found){
 		sprintf(aux_name, "$_%s_%d", tmp_name, index);
-		if( hashSearch(hash, aux_name, TK_IDENTIFIER) == NULL)
+		if( hashSearch(hash, aux_name, SYMBOL_IDENTIFIER) == NULL)
 			not_found=false;
 		else
 			index++;
 	}
-	return hashInsert(hash, aux_name, TK_IDENTIFIER);
+	return hashInsert(hash, aux_name, SYMBOL_IDENTIFIER);
 }
 
 
@@ -232,6 +235,8 @@ HashTable *TACCall(ASTNode *ast, HashTable *hash, TACQueue **queue){
 	char params[16];
 	int arg_count=0;
 
+	return_value->type = ast->hashValue->type;
+
 	if(ast->children[0]!=NULL)
 		for(args=ast->children[0]->children[0];args!=NULL;args=args->children[1]){
 			arg_count++;
@@ -248,7 +253,7 @@ HashTable *TACCall(ASTNode *ast, HashTable *hash, TACQueue **queue){
 
 	sprintf(params, "%d", arg_count);
 
-	TACQueueInsert(
+	*queue = TACQueueInsert(
 		*queue,
 		TACCreate(
 			TAC_CALL,
@@ -259,6 +264,33 @@ HashTable *TACCall(ASTNode *ast, HashTable *hash, TACQueue **queue){
 	);
 
 	return return_value;
+}
+
+DataType GetExpressionType(TACType operator, ASTNode *ast){
+	switch(operator){
+	case TAC_GREAT:
+	case TAC_LESS:
+	case TAC_LE:
+	case TAC_GE:
+	case TAC_EQ:
+	case TAC_NE:
+	case TAC_AND:
+	case TAC_OR:
+		return DT_BOOL;
+	case TAC_ADD:
+	case TAC_SUB:
+	case TAC_MUL:
+	case TAC_DIV:
+		return WHICH_DT(ast->children[0]->hashValue, ast->children[1]->hashValue);
+	case TAC_ADDRESS:
+		return DT_ADDRESS;
+	case TAC_POINTER:
+		return ast->hashValue->type;
+	case TAC_NOT:
+		return ast->children[0]->hashValue->type;
+	default:
+		exit(42);
+	}
 }
 
 HashTable *TACExpression(ASTNode *ast, HashTable *hash, TACQueue **queue){
@@ -314,9 +346,10 @@ HashTable *TACExpression(ASTNode *ast, HashTable *hash, TACQueue **queue){
 		case AST_not:
 			operator = operator == TAC_SYMBOL ? TAC_NOT : operator;
 			val=HashInsertTmp(hash, "expression");
+			val->type = GetExpressionType(operator, ast);
 			*queue = TACQueueJoin(
 				*queue,
-				TACOperate(hash, operator, val, ast->children[0],ast->children[1])
+				TACOperate(hash, operator, val, ast->children[0], ast->children[1])
 			);
 			break;
 		case AST_identifier:
@@ -372,6 +405,7 @@ TACQueue *TACIf(ASTNode *ast, HashTable *hash){
 	TACQueue *queue=NULL;
 	HashTable *else_=HashInsertTmp(hash, "else");
 	HashTable *finally_=HashInsertTmp(hash, "finally");
+	else_->type = DT_LABEL; finally_->type = DT_LABEL;
 
 	// Test condition
 	queue = TACQueueInsert(
@@ -409,6 +443,7 @@ TACQueue *TACLoop(ASTNode *ast, HashTable *hash){
 	TACQueue *queue=NULL;
 	HashTable *loop_start=HashInsertTmp(hash, "loop_start");
 	HashTable *loop_end=HashInsertTmp(hash, "loop_end");
+	loop_start->type = DT_LABEL; loop_end->type = DT_LABEL;
 
 	queue = TACQueueJoin(queue, TACLabel(loop_start));
 
@@ -430,6 +465,19 @@ TACQueue *TACLoop(ASTNode *ast, HashTable *hash){
 	return queue;
 }
 
+HashTable *TACOutput(ASTNode *ast, HashTable *hash, TACQueue **queue){
+	HashTable *tmp;
+	if(ast->hashValue == NULL)
+		return TACExpression(ast->children[0],hash,queue);
+	else if (ast->hashValue->code != SYMBOL_LIT_STRING)
+		return ast->hashValue;
+
+	tmp = HashInsertTmp(hash, "string");
+	tmp->type = DT_STRING;
+	tmp->nature = DN_ARRAY;
+	tmp->args = (void *)ast->hashValue->value;
+	return tmp;
+}
 
 TACQueue *TACCommand(ASTNode *ast, HashTable *hash){
 	TACQueue *queue=NULL;
@@ -479,7 +527,7 @@ TACQueue *TACCommand(ASTNode *ast, HashTable *hash){
 					queue,
 					TACCreate(
 						TAC_PRINT,
-						ast->hashValue != NULL ? ast->hashValue : TACExpression(ast->children[0],hash,&queue),
+						TACOutput(ast, hash, &queue),
 						NULL,
 						NULL
 					)

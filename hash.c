@@ -2,7 +2,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define HASH_SIZE 993 
+
+HashTable *HashSetTypeNature(HashTable *hash, DataType type, DataNature nature){
+	hash->type = type;
+	hash->nature = nature;
+
+	return hash;
+}
 
 void hashPrint(HashTable *hash){
     int i;
@@ -11,10 +17,10 @@ void hashPrint(HashTable *hash){
         HashTable *curHash=&hash[i];
         if(curHash->value){
             for(;curHash->next;curHash=curHash->next){
-                    printf("HASH[%i]{%i}: %s\n", i, curHash->code, curHash->value);
+            	PRINT_IHASH(curHash, i);
             }
             if(curHash->value)
-                printf("HASH[%i]{%i}: %s\n", i, curHash->code, curHash->value);
+            	PRINT_IHASH(curHash, i);
         }
     }
 }

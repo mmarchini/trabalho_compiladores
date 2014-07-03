@@ -30,6 +30,8 @@
 #include "hash.h"
 #include "ast.h"
 
+#define SET_TYPE_NATURE(hash, _type, _nature) hash->type=_type; hash->nature=_nature; 
+
 extern FILE *outputFile;
 ASTNode *ast;
 %}
@@ -183,9 +185,9 @@ expr : expr '>'          expr     {$$ = astCreate(AST_great,      NULL,   $1,   
      | '$' TK_IDENTIFIER          {$$ = astCreate(AST_pointer,    $2,   NULL, NULL, NULL, NULL);} 
      | '!' expr                   {$$ = astCreate(AST_not,        NULL,   $2, NULL, NULL, NULL);} //
      | TK_IDENTIFIER              {$$ = astCreate(AST_identifier,   $1, NULL, NULL, NULL, NULL);} // 
-     | LIT_CHAR                   {$$ = astCreate(AST_lit_char,     $1, NULL, NULL, NULL, NULL);} // 
-     | LIT_INTEGER                {$$ = astCreate(AST_lit_int,      $1, NULL, NULL, NULL, NULL);} //
-     | boolean                    {$$ = $1;} //
+     | LIT_CHAR                   {$$ = astCreate(AST_lit_char,     HashSetTypeNature($1, DT_BYTE, DN_SCALAR), NULL, NULL, NULL, NULL);} // 
+     | LIT_INTEGER                {$$ = astCreate(AST_lit_int,      HashSetTypeNature($1, DT_WORD, DN_SCALAR), NULL, NULL, NULL, NULL);} //
+     | boolean                    {$1->hashValue=HashSetTypeNature($1->hashValue, DT_BYTE, DN_SCALAR); $$ = $1;} //
      | call                       {$$ = $1;} //
      | TK_IDENTIFIER '[' expr ']' {$$ = astCreate(AST_vet_ident,  $1, $3, NULL, NULL, NULL);} //
      | '(' expr ')'               {$$ = astCreate(AST_par_block, NULL, 

@@ -1,13 +1,19 @@
 #ifndef _HASH
 #define _HASH
 
+#define HASH_SIZE 993
+
+#define PRINT_HASH(hash) printf("HASH{C:%i,T:%i,N:%i}: %s\n", hash->code, hash->type, hash->nature, hash->value);
+#define PRINT_IHASH(hash, i) printf("HASH[%i]{C:%i,T:%i,N:%i}: %s\n", i, hash->code, hash->type, hash->nature, hash->value);
+
 typedef enum {
     DT_INVALID= -1, 
     DT_NULL = 0, 
     DT_BYTE = 1, 
-    DT_WORD = 2, 
+    DT_WORD = 2,
     DT_STRING = 3, 
     DT_BOOL = 4,
+    DT_LABEL = 5,
     DT_ADDRESS = 10
 }DataType;
 
@@ -34,6 +40,8 @@ HashTable *hashInit();
 HashTable *hashInsert(HashTable *hash, char *value, int code);
 
 HashTable *hashSearch(HashTable *hash, char *value, int code);
+
+HashTable *HashSetTypeNature(HashTable *hash, DataType type, DataNature nature);
 
 int hashCalculate(char *value);
 

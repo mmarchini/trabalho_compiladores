@@ -30,6 +30,7 @@ typedef enum {
 	TAC_ENDFUN,
 
 	TAC_IFZ,
+	TAC_IFN,
 	TAC_JUMP,
 
 	TAC_CALL,
